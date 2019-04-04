@@ -5,7 +5,6 @@ import cgeo.geocaching.models.Geocache;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import android.view.View;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
@@ -19,7 +18,7 @@ import butterknife.ButterKnife;
  */
 public final class GCVoteRatingBarUtil {
     public interface OnRatingChangeListener {
-        void onRatingChanged(final float stars);
+        void onRatingChanged(float stars);
     }
 
     private GCVoteRatingBarUtil() {

@@ -1,12 +1,12 @@
 package cgeo.geocaching.maps.interfaces;
 
-import cgeo.geocaching.models.IWaypoint;
 import cgeo.geocaching.location.Geopoint;
+import cgeo.geocaching.models.IWaypoint;
 
 public interface MapItemFactory {
 
-    GeoPointImpl getGeoPointBase(final Geopoint coords);
+    GeoPointImpl getGeoPointBase(Geopoint coords);
 
-    CachesOverlayItemImpl getCachesOverlayItem(final IWaypoint iWaypoint, final boolean applyDistanceRule);
+    CachesOverlayItemImpl getCachesOverlayItem(IWaypoint iWaypoint, boolean applyDistanceRule);
 
 }

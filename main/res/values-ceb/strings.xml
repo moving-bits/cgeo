@@ -158,6 +158,7 @@
     <string name="err_parse">Napakyas nga pagpasulod sa parsing nga panid</string>
     <string name="err_server">Dili ma kontak ang Geocaching.com. Ang website ay mahimo nga ubos o ang imong koneksyon sa internet kay dili mogana.</string>
     <string name="err_server_ec">Dili ma kontak ang Extremecahing.com. Ang website ay mahimo nga ubos o ang imong koneksyon sa internet kay dili mogana.</string>
+    <string name="err_server_su">Unable to contact Geocaching.su. The website may be down or your internet connection not working.</string>
     <string name="err_server_gk">Dili ma kontak ang GeoKrety.org, Ang website ay mahimo nga ubos o ang imong koneksyon sa internet kay dili mogana.</string>
     <string name="err_login">Walay pagsulod sa impormasyon nga gitipigan</string>
     <string name="err_login_failed_toast">ang c:geo dili makasulod sa c:geo kay nagtrabaho sa offline nga gitipigan sa mga caches. Susihon ang mga setting sa pagsulod ug ang pag-aktibo sa imohang linya sa internet.</string>
@@ -196,6 +197,7 @@
     <string name="err_favorite_failed">Napakyas ang pag-usab sa paborito na status.</string>
     <string name="err_select_logimage_failed">Pagpili og imahe para sa log kay napakyas.</string>
     <string name="err_acquire_image_failed">Ang pagbaton og imahe kay napakyas.</string>
+    <string name="err_unsupported_image_format">Unsupported image format.</string>
     <string name="err_tb_display">ang c:geo dili maka pakita sa trackable na imong gusto. Kani ba trackable gyud?</string>
     <string name="err_tb_details_open">ang c:geo dili maka abli sa mga detalye sa trackable.</string>
     <string name="err_tb_not_loggable">Kani nga geocache trackable kay dili pwede gamiton.</string>
@@ -258,7 +260,6 @@
     <string name="info_log_report_problem_changed">Available problem reports have changed!</string>
     <string name="info_select_logimage_cancelled">Gipakansela ang pagpili o pagdakop sa imahe.</string>
     <string name="info_stored_image">Ang bag-ong hulagway kay i-save sa:</string>
-    <string name="info_storing_static_maps">Gipaninguha og pagpundo sa istatik nga mga mapa</string>
     <string name="info_cache_saved">Ang cache kay napundo ra diri nga lokal</string>
     <string name="warn_calculator_state_save">Siguroha nga i-save ang waypoint kung gusto nimo nga mopabilin sa istado nga kalkulador.</string>
     <string name="err_trackable_log_not_anonymous">Logging %1$s gikan sa c:geo kay dili puwede nga mahimo nga dili mailhan. Ganahan ba ka moabli sa mga settings para mapuno ang imong mga kredensyal gikan sa %2$s?</string>
@@ -425,6 +426,7 @@
     <string name="about_system_info">impormasyon sa sistemang c:geo</string>
     <string name="about_system_info_send_chooser">Ihatag ang impormasyon sa sistema</string>
     <string name="changelog_github">Ang listahan sa tanang kausaban</string>
+    <string name="about_nutshellmanual">Online manual</string>
     <!-- settings -->
     <string name="settings_title_open_settings">Ablihon ang mga setting?</string>
     <string name="settings_title_services">Ang mga serbisyo</string>
@@ -434,7 +436,7 @@
     <string name="settings_title_cachedetails">Ang mga detalye sa cache</string>
     <string name="settings_summary_cachedetails">Disenyohi ang pagpakita sa impormasyon sa cache.</string>
     <string name="settings_title_offlinedata">Offline Data</string>
-    <string name="settings_summary_offlinedata">Pag-kompigyur sa istatik nga mga mapa ug uban pang mga offline nga storage sa datos.</string>
+    <string name="settings_summary_offlinedata">Configure other offline data storage.</string>
     <string name="settings_title_logging">Logging</string>
     <string name="settings_summary_logging">I-kompigyur ang imong pirma ug itakda ang mga kapilian sa pag-log.</string>
     <string name="settings_title_map">Mapa</string>
@@ -462,6 +464,7 @@
     <string name="settings_goto_url_button">dugang …</string>
     <string name="settings_title_gc">Geocaching.com</string>
     <string name="settings_title_ec">Extremcaching.com</string>
+    <string name="settings_title_su">Geocaching.su</string>
     <string name="settings_title_ox">Opencaching.com (Garmin)</string>
     <string name="settings_activate_gc">Pag-aktibo</string>
     <string name="settings_activate_ec">Pag-aktibo</string>
@@ -555,12 +558,10 @@
     <string name="init_summary_exclude">Ayaw i-apil ang mga caches nga imong gipanag-iya o nakaplagan</string>
     <string name="init_showwaypoints">Ipakita ang Waypoints</string>
     <string name="init_showwaypoint_description">Kung mas ubos kay sa gihatag nga kantidad sa mga caches nga gipakita sa mapa, ang ilang mga waypoint gipakita usab.</string>
+    <string name="init_brouterThreshold">Calculate route</string>
+    <string name="init_brouterThreshold_description">Maximum distance up to which brouter helper app (if installed) will calculate a route.</string>
     <string name="init_disabled">Walay ang Disabled</string>
     <string name="init_summary_disabled">Walay ang mga cache sa Disabled</string>
-    <string name="init_offline">Mga static nga Mapa</string>
-    <string name="init_summary_offline">Tagu-i ang static nga mga mapa alang sa offline nga paggamit</string>
-    <string name="init_offline_wp">Mga Static nga Mapa (WP)</string>
-    <string name="init_summary_offline_wp">Tapigi ang mga waypoint static nga mga mapa alang sa offline nga paggamit</string>
     <string name="init_save_log_img">I-save ang mga Imahe</string>
     <string name="init_summary_save_log_img">I-save ang mga Imahe nga gikan sa Logs</string>
     <string name="init_units">Gamita ang Imperial nga mga Unit</string>
@@ -686,8 +687,7 @@
     <!-- map sources -->
     <string name="map_source_google_map">Google: Mapa</string>
     <string name="map_source_google_satellite">Google: Satellite</string>
-    <string name="map_source_osm_mapnik">OSM: Mapnik</string>
-    <string name="map_source_osm_cyclemap">OSM: Cyclemap</string>
+    <string name="map_source_osm_mapnik">OSM: Map</string>
     <string name="map_source_osm_offline">Offline</string>
     <string name="init_sendToCgeo">Ipadala sa c:geo</string>
     <string name="settings_info_send2cgeo_title">Impormasyon sa send2cgeo</string>
@@ -732,6 +732,8 @@
     <string name="auth_ocro">opencaching.ro</string>
     <string name="auth_ocuk">opencache.uk</string>
     <string name="auth_dialog_completed_oc">ang c:geo kay ge awtorisar para makig-interact kauban ang %s.</string>
+    <!-- auth geocaching.su -->
+    <string name="auth_su">geocaching.su</string>
     <!-- auth geokrety -->
     <string name="auth_dialog_completed_geokrety">ang c:geo kay ge awtorisar nga makig-interact kauban ang %s.</string>
     <string name="err_auth_geokrety_bad_password">Ang imohang username/password kay murag dili balido.</string>
@@ -795,6 +797,11 @@
     <string name="cache_description">Paghulagway</string>
     <string name="cache_description_long">Taas nga paghulagway</string>
     <string name="cache_description_table_note">Ang paghulagway adunay han-ay nga porma nga mahimong giya para makita %s og tarung ug sakto.</string>
+    <string name="cache_area_description">Area Description</string>
+    <string name="cache_cache_description">Cache Description</string>
+    <string name="cache_virtual_description">Virtual Question</string>
+    <string name="cache_traditional_description">Traditional Part</string>
+    <string name="cache_box_description">Box Content</string>
     <string name="cache_watchlist_on">Ang kini nga cache kay anaa sa imong listahan.</string>
     <string name="cache_watchlist_on_extra">Ang kini nga cache kay anaa sa imong listahan(Listahan: %1d).</string>
     <string name="cache_watchlist_not_on">Ang kini nga cache kay wala sa imong watchlist.</string>
@@ -856,8 +863,6 @@
     <string name="cache_menu_radar">Radar</string>
     <string name="cache_menu_map">Mapa</string>
     <string name="cache_menu_mfbeta">Mapsforge beta</string>
-    <string name="cache_menu_map_static">Statiko nga mga Mapa</string>
-    <string name="cache_menu_download_map_static">I-download ang statiko nga mga Mapa</string>
     <string name="cache_menu_rmaps">Rmaps</string>
     <string name="cache_menu_map_ext">Ubang naa sa sulod nga apps</string>
     <string name="cache_menu_streetview">Lantaw sa karsada</string>
@@ -946,7 +951,6 @@
     <string name="gpx_import_loading_caches_with_filename">Pagload sa mga cache gikan sa %1$s</string>
     <string name="gpx_import_loading_waypoints">Nag-loading pa ang waypoints nga file</string>
     <string name="gpx_import_loading_waypoints_with_filename">Nagload sa waypoints gikan sa %1$s</string>
-    <string name="gpx_import_store_static_maps">Gitago ang mga static nga mapa</string>
     <string name="gpx_import_caches_imported">gi-import ang caches</string>
     <string name="gpx_import_caches_imported_with_filename">%1$d gi-import ang caches sa %2$s</string>
     <string name="gpx_import_static_maps_skipped">Ang pag-download ug static maps kay gi-abort</string>
@@ -1562,4 +1566,9 @@
     <string name="err_logimage_caption_required">Ang kapsyon kay kinahanglan jod para sa imahe</string>
     <string name="waypoint_latitude_null">N/S --° --.---</string>
     <string name="waypoint_longitude_null">E/W --° --.---</string>
+    <!-- permission handling -->
+    <string name="close_app">Close app</string>
+    <string name="ask_again">Ask me again</string>
+    <string name="location_permission_request_explanation">c:geo needs access to the GPS on your device to locate your position and calculate distance and direction to geocaches. It cannot be used without this permission.</string>
+    <string name="storage_permission_request_explanation">c:geo will write data onto your phone storage or SD card as soon as you save geocaches for offline use. Furthermore c:geo will use your phone storage for import and export of files and reading of offline maps. It cannot be used without this permission.</string>
 </resources>

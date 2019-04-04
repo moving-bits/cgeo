@@ -38,6 +38,9 @@ import cgeo.geocaching.maps.mapsforge.v6.layers.TapHandlerLayer;
 import cgeo.geocaching.maps.routing.Routing;
 import cgeo.geocaching.maps.routing.RoutingMode;
 import cgeo.geocaching.models.Geocache;
+import cgeo.geocaching.permission.PermissionHandler;
+import cgeo.geocaching.permission.PermissionRequestContext;
+import cgeo.geocaching.permission.RestartLocationPermissionGrantedCallback;
 import cgeo.geocaching.sensors.GeoData;
 import cgeo.geocaching.sensors.GeoDirHandler;
 import cgeo.geocaching.sensors.Sensors;
@@ -781,7 +784,15 @@ public class NewMap extends AbstractActionBarActivity implements XmlRenderThemeM
             targetView.setTarget(target.getGeocode(), target.getName());
         }
 
-        this.resumeDisposables.add(this.geoDirUpdate.start(GeoDirHandler.UPDATE_GEODIR));
+        // resume location access
+        PermissionHandler.executeIfLocationPermissionGranted(this,
+                new RestartLocationPermissionGrantedCallback(PermissionRequestContext.NewMap) {
+
+                    @Override
+                    public void executeAfter() {
+                        resumeDisposables.add(geoDirUpdate.start(GeoDirHandler.UPDATE_GEODIR));
+                    }
+                });
     }
 
     @Override
@@ -885,10 +896,14 @@ public class NewMap extends AbstractActionBarActivity implements XmlRenderThemeM
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        Log.d("New map: onSaveInstanceState");
+
         final MapState state = prepareMapState();
         outState.putParcelable(BUNDLE_MAP_STATE, state);
         if (historyLayer != null) {
-            outState.putParcelableArrayList(BUNDLE_TRAIL_HISTORY, historyLayer.getHistory());
+            trailHistory = historyLayer.getHistory();
+            outState.putParcelableArrayList(BUNDLE_TRAIL_HISTORY, trailHistory);
         }
     }
 

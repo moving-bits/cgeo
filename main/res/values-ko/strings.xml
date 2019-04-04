@@ -158,6 +158,7 @@
     <string name="err_parse">로그 페이지 분석에 실패했습니다</string>
     <string name="err_server">Geocaching.com에 접속이 되지 않습니다. 해당 웹사이트의 서버가 다운됐거나 인터넷 연결이 안된 경우일 수도 있습니다.</string>
     <string name="err_server_ec">Extremcaching.com에 접속이 되지 않습니다. 해당 웹사이트의 서버가 다운됐거나 인터넷 연결이 안된 경우일 수도 있습니다.</string>
+    <string name="err_server_su">Unable to contact Geocaching.su. The website may be down or your internet connection not working.</string>
     <string name="err_server_gk">GeoKrety.org에 접속이 되지 않습니다. 해당 웹사이트의 서버가 다운됐거나 인터넷 연결이 안된 경우일 수도 있습니다.</string>
     <string name="err_login">저장된 로그인 정보가 없습니다</string>
     <string name="err_login_failed_toast">c:geo에서 로그인할 수 없습니다. 저장된 데이터를 사용하여 오프라인으로 작동됩니다. 로그인 설정과 인터넷 상태를 확인하세요.</string>
@@ -196,6 +197,7 @@
     <string name="err_favorite_failed">호감캐시 상태를 바꾸지 못했습니다.</string>
     <string name="err_select_logimage_failed">찾지못함 로그에 대한 사진을 선택하는 중</string>
     <string name="err_acquire_image_failed">사진 가져오기 실패</string>
+    <string name="err_unsupported_image_format">Unsupported image format.</string>
     <string name="err_tb_display">원하시는 추적아이템을 표시할 수 없습니다. 정말 추적아이템이 맞나요?</string>
     <string name="err_tb_details_open">추적아이템 상세정보를 열 수 없습니다.</string>
     <string name="err_tb_not_loggable">이 추적아이템은 로그할 수 없습니다.</string>
@@ -258,7 +260,6 @@
     <string name="info_log_report_problem_changed">사용할 수 있는 문제점 신고가 변경 되었습니다!</string>
     <string name="info_select_logimage_cancelled">사진 선택 또는 캡처가 취소되었습니다.</string>
     <string name="info_stored_image">새로운 사진 저장 위치 :</string>
-    <string name="info_storing_static_maps">정적 지도를 저장하는 중입니다.</string>
     <string name="info_cache_saved">캐시가 기기에 저장되었습니다.</string>
     <string name="warn_calculator_state_save">계산기 상태를 유지하려면 웨이포인트를 저장해야 합니다.</string>
     <string name="err_trackable_log_not_anonymous">c:geo에서 익명으로 %1$s를 로그할 수 없습니다. 설정을 열어 %2$s 의 계정정보를 입력하시겠습니까?</string>
@@ -422,6 +423,7 @@
     <string name="about_system_info">c:geo 시스템 정보</string>
     <string name="about_system_info_send_chooser">시스템 정보 보내기</string>
     <string name="changelog_github">모든 변경 목록</string>
+    <string name="about_nutshellmanual">Online manual</string>
     <!-- settings -->
     <string name="settings_title_open_settings">설정 열기?</string>
     <string name="settings_title_services">서비스</string>
@@ -431,7 +433,7 @@
     <string name="settings_title_cachedetails">캐시 상세정보</string>
     <string name="settings_summary_cachedetails">캐시정보 표시 사용자가 지정하기</string>
     <string name="settings_title_offlinedata">오프라인 데이타</string>
-    <string name="settings_summary_offlinedata">정적 지도 및 기타 오프라인 데이터 저장소 설정하기</string>
+    <string name="settings_summary_offlinedata">Configure other offline data storage.</string>
     <string name="settings_title_logging">로그하기</string>
     <string name="settings_summary_logging">서명 및 로그 옵션 설정하기</string>
     <string name="settings_title_map">지도</string>
@@ -459,6 +461,7 @@
     <string name="settings_goto_url_button">더보기…</string>
     <string name="settings_title_gc">Geocaching.com</string>
     <string name="settings_title_ec">Extremcaching.com</string>
+    <string name="settings_title_su">Geocaching.su</string>
     <string name="settings_title_ox">Opencaching.com (Garmin)</string>
     <string name="settings_activate_gc">활성화</string>
     <string name="settings_activate_ec">활성화</string>
@@ -552,12 +555,10 @@
     <string name="init_summary_exclude">자신이 숨긴 캐시와 이미 찾은 캐시를 제외합니다.</string>
     <string name="init_showwaypoints">웨이포인트 보기</string>
     <string name="init_showwaypoint_description">지도에 지정한 캐시 이하만 보일 경우, 웨이포인트를 추가로 표시합니다.</string>
+    <string name="init_brouterThreshold">Calculate route</string>
+    <string name="init_brouterThreshold_description">Maximum distance up to which brouter helper app (if installed) will calculate a route.</string>
     <string name="init_disabled">비활성캐시 제외하기</string>
     <string name="init_summary_disabled">일시정지된 캐시 숨기기</string>
-    <string name="init_offline">정적 지도</string>
-    <string name="init_summary_offline">오프라인용으로 정적지도를 저장합니다.</string>
-    <string name="init_offline_wp">정적 지도(WP)</string>
-    <string name="init_summary_offline_wp">오프라인용으로 웨이포인트 정적 지도를 저장합니다.</string>
     <string name="init_save_log_img">사진 저장하기</string>
     <string name="init_summary_save_log_img">로그에 있는 사진을 저장합니다.</string>
     <string name="init_units">영미식 단위 사용하기</string>
@@ -683,8 +684,7 @@
     <!-- map sources -->
     <string name="map_source_google_map">구글 : 지도</string>
     <string name="map_source_google_satellite">구글 : 위성</string>
-    <string name="map_source_osm_mapnik">OSM : Mapnik</string>
-    <string name="map_source_osm_cyclemap">OSM : 자전거지도</string>
+    <string name="map_source_osm_mapnik">OSM: Map</string>
     <string name="map_source_osm_offline">오프라인</string>
     <string name="init_sendToCgeo">c:geo로 보내기</string>
     <string name="settings_info_send2cgeo_title">send2cgeo에 관한 정보</string>
@@ -729,6 +729,8 @@
     <string name="auth_ocro">opencaching.ro</string>
     <string name="auth_ocuk">opencache.uk</string>
     <string name="auth_dialog_completed_oc">이제 c:geo에서 %s 에 상호작용하도록 허용되었습니다.</string>
+    <!-- auth geocaching.su -->
+    <string name="auth_su">geocaching.su</string>
     <!-- auth geokrety -->
     <string name="auth_dialog_completed_geokrety">이제 c:geo에서 %s 에 상호작용하도록 허용되었습니다.</string>
     <string name="err_auth_geokrety_bad_password">사용자명/비밀번호가 맞지 않는 것 같습니다.</string>
@@ -786,6 +788,11 @@
     <string name="cache_description">설명</string>
     <string name="cache_description_long">긴 설명</string>
     <string name="cache_description_table_note">설명에는 %s에서 잘 보이도록 테이블 포맷이 포함됩니다.</string>
+    <string name="cache_area_description">Area Description</string>
+    <string name="cache_cache_description">Cache Description</string>
+    <string name="cache_virtual_description">Virtual Question</string>
+    <string name="cache_traditional_description">Traditional Part</string>
+    <string name="cache_box_description">Box Content</string>
     <string name="cache_watchlist_on">관심목록에 있는 캐시입니다.</string>
     <string name="cache_watchlist_on_extra">이 캐시는 관심목록에 있습니다(총 인원 : %1d).</string>
     <string name="cache_watchlist_not_on">이 캐시는 관심목록에 없습니다.</string>
@@ -846,8 +853,6 @@
     <string name="cache_menu_radar">레이더</string>
     <string name="cache_menu_map">지도</string>
     <string name="cache_menu_mfbeta">Mapsforge 베타</string>
-    <string name="cache_menu_map_static">정적 지도</string>
-    <string name="cache_menu_download_map_static">정적지도 다운로드</string>
     <string name="cache_menu_rmaps">Rmaps</string>
     <string name="cache_menu_map_ext">기타 외부 앱</string>
     <string name="cache_menu_streetview">스트리트 뷰</string>
@@ -936,7 +941,6 @@
     <string name="gpx_import_loading_caches_with_filename">%1$s 에서 캐시 불러오는 중</string>
     <string name="gpx_import_loading_waypoints">지점 파일 불러오는 중</string>
     <string name="gpx_import_loading_waypoints_with_filename">%1$s 에서 웨이포인트 불러오는 중</string>
-    <string name="gpx_import_store_static_maps">정적 지도 저장중</string>
     <string name="gpx_import_caches_imported">가져온 캐시</string>
     <string name="gpx_import_caches_imported_with_filename">%1$d 개의 캐시를 %2$s 에서 가져왔습니다.</string>
     <string name="gpx_import_static_maps_skipped">정적지도 다운로드가 중단됨</string>
@@ -1540,4 +1544,9 @@
     <string name="err_logimage_caption_required">영상에 설명이 필요합니다.</string>
     <string name="waypoint_latitude_null">N/S --° --.---</string>
     <string name="waypoint_longitude_null">E/W --° --.---</string>
+    <!-- permission handling -->
+    <string name="close_app">Close app</string>
+    <string name="ask_again">Ask me again</string>
+    <string name="location_permission_request_explanation">c:geo needs access to the GPS on your device to locate your position and calculate distance and direction to geocaches. It cannot be used without this permission.</string>
+    <string name="storage_permission_request_explanation">c:geo will write data onto your phone storage or SD card as soon as you save geocaches for offline use. Furthermore c:geo will use your phone storage for import and export of files and reading of offline maps. It cannot be used without this permission.</string>
 </resources>

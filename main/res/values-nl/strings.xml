@@ -158,6 +158,7 @@
     <string name="err_parse">Login pagina verwerken mislukt</string>
     <string name="err_server">Verbinding met Geocaching.com mislukt (geen verbinding of server niet bereikbaar)</string>
     <string name="err_server_ec">Verbinding maken met Extremcaching.com is mislukt (geen verbinding of server niet bereikbaar).</string>
+    <string name="err_server_su">Verbinding met Geocaching.su mislukt (geen verbinding of server niet bereikbaar).</string>
     <string name="err_server_gk">Niet mogelijk om GeoKrety.org te bereiken. De website kan offline zijn of je internetverbinding werkt niet goed.</string>
     <string name="err_login">Geen login informatie opgeslagen</string>
     <string name="err_login_failed_toast">Sorry, c:geo kan niet inloggen. c:geo werkt in offline modus. Controleer je gebruikersnaam en wachtwoord en/of zet de internetverbinding aan.</string>
@@ -196,6 +197,7 @@
     <string name="err_favorite_failed">Wijzigen favorieten status is mislukt.</string>
     <string name="err_select_logimage_failed">Selecteren van een foto voor het log is mislukt.</string>
     <string name="err_acquire_image_failed">Verwerven van een foto is mislukt.</string>
+    <string name="err_unsupported_image_format">Beeldformaat niet ondersteund.</string>
     <string name="err_tb_display">Sorry, c:geo kan de gezochte trackable niet weergeven. Is het wel een trackable?</string>
     <string name="err_tb_details_open">Sorry, c:geo kan de trackable details niet laden.</string>
     <string name="err_tb_not_loggable">Deze Trackable kan je niet loggen.</string>
@@ -258,7 +260,6 @@
     <string name="info_log_report_problem_changed">Beschikbare probleemrapporten zijn gewijzigd!</string>
     <string name="info_select_logimage_cancelled">Foto selectie of opname is geannuleerd.</string>
     <string name="info_stored_image">Nieuwe foto opgeslagen in:</string>
-    <string name="info_storing_static_maps">Proberen statische kaarten op te slaan</string>
     <string name="info_cache_saved">De cache is lokaal opgeslagen</string>
     <string name="warn_calculator_state_save">Zorg dat je een waypoint opslaat als je de staat van de rekenmachine wil behouden.</string>
     <string name="err_trackable_log_not_anonymous">Loggen van %1$s in c:geo kan niet anoniem worden gedaan. Wilt u de instellingen openen om uw referenties van %2$s in te vullen?</string>
@@ -425,6 +426,7 @@
     <string name="about_system_info">c:geo systeeminformatie</string>
     <string name="about_system_info_send_chooser">Verzend systeeminformatie</string>
     <string name="changelog_github">Lijst met alle wijzigingen</string>
+    <string name="about_nutshellmanual">Online handleiding</string>
     <!-- settings -->
     <string name="settings_title_open_settings">Instellingen openen?</string>
     <string name="settings_title_services">Diensten</string>
@@ -434,7 +436,7 @@
     <string name="settings_title_cachedetails">Cache Details</string>
     <string name="settings_summary_cachedetails">De weergave van cache-informatie aanpassen.</string>
     <string name="settings_title_offlinedata">Offline gegevens</string>
-    <string name="settings_summary_offlinedata">Statische kaarten en andere offline gegevensopslag configuren.</string>
+    <string name="settings_summary_offlinedata">Andere offline gegevensopslag configureren.</string>
     <string name="settings_title_logging">Logboek</string>
     <string name="settings_summary_logging">Configureer handtekening en stel log-opties in.</string>
     <string name="settings_title_map">Kaart</string>
@@ -462,6 +464,7 @@
     <string name="settings_goto_url_button">meer…</string>
     <string name="settings_title_gc">Geocaching.com</string>
     <string name="settings_title_ec">Extremcaching.com</string>
+    <string name="settings_title_su">Geocaching.su</string>
     <string name="settings_title_ox">Opencaching.com (Garmin)</string>
     <string name="settings_activate_gc">Activeren</string>
     <string name="settings_activate_ec">Activeren</string>
@@ -555,12 +558,10 @@
     <string name="init_summary_exclude">Eigen en gevonden caches uitsluiten</string>
     <string name="init_showwaypoints">Laat waypoints zien in map</string>
     <string name="init_showwaypoint_description">Level vanaf wanneer waypoints weergegeven worden in de map.</string>
+    <string name="init_brouterThreshold">Route berekenen</string>
+    <string name="init_brouterThreshold_description">Maximale afstand tot welke brouter helper app (indien geïnstalleerd) een route zal berekenen.</string>
     <string name="init_disabled">Uitgeschakelde caches uitsluiten</string>
     <string name="init_summary_disabled">Uitgeschakelde caches uitsluiten</string>
-    <string name="init_offline">Statische kaarten</string>
-    <string name="init_summary_offline">Kaarten opslaan voor gebruik zonder verbinding</string>
-    <string name="init_offline_wp">Statische kaarten (WP)</string>
-    <string name="init_summary_offline_wp">Statische kaarten van waypoints opslaan voor gebruik zonder verbinding</string>
     <string name="init_save_log_img">Afbeeldingen opslaan</string>
     <string name="init_summary_save_log_img">Sla afbeeldingen van logs op</string>
     <string name="init_units">Gebruik imperiale stelsel voor afstanden</string>
@@ -686,8 +687,7 @@
     <!-- map sources -->
     <string name="map_source_google_map">Google: Map</string>
     <string name="map_source_google_satellite">Google: Satellite</string>
-    <string name="map_source_osm_mapnik">OSM: Mapnik</string>
-    <string name="map_source_osm_cyclemap">OSM: Cyclemap</string>
+    <string name="map_source_osm_mapnik">OSM: Kaart</string>
     <string name="map_source_osm_offline">Offline</string>
     <string name="init_sendToCgeo">Verstuur naar c:geo</string>
     <string name="settings_info_send2cgeo_title">Informatie over send2cgeo</string>
@@ -732,6 +732,8 @@
     <string name="auth_ocro">opencaching.ro</string>
     <string name="auth_ocuk">opencache.uk</string>
     <string name="auth_dialog_completed_oc">c:geo is nu gekoppeld met %s.</string>
+    <!-- auth geocaching.su -->
+    <string name="auth_su">geocaching.su</string>
     <!-- auth geokrety -->
     <string name="auth_dialog_completed_geokrety">c:geo is nu geautoriseerd om met %s te communiceren.</string>
     <string name="err_auth_geokrety_bad_password">Je gebruikersnaam/wachtwoord lijkt ongeldig.</string>
@@ -795,6 +797,11 @@
     <string name="cache_description">Omschrijving</string>
     <string name="cache_description_long">Lange omschrijving</string>
     <string name="cache_description_table_note">Omschrijving bevat een tabel-layout welke misschien op %s bekeken moet worden.</string>
+    <string name="cache_area_description">Beschrijving van het gebied</string>
+    <string name="cache_cache_description">Cache beschrijving</string>
+    <string name="cache_virtual_description">Virtuele vraag</string>
+    <string name="cache_traditional_description">Traditionele cache</string>
+    <string name="cache_box_description">Inhoud van de doos</string>
     <string name="cache_watchlist_on">Deze cache komt voor op je watchlist.</string>
     <string name="cache_watchlist_on_extra">Deze cache staat op jouw volglijst (Watchers: %1d).</string>
     <string name="cache_watchlist_not_on">Deze cache komt niet voor op je watchlist.</string>
@@ -856,8 +863,6 @@
     <string name="cache_menu_radar">Radar</string>
     <string name="cache_menu_map">Toon op kaart</string>
     <string name="cache_menu_mfbeta">Mapsforge Beta</string>
-    <string name="cache_menu_map_static">Statische kaarten</string>
-    <string name="cache_menu_download_map_static">Download statische kaarten</string>
     <string name="cache_menu_rmaps">Rmaps</string>
     <string name="cache_menu_map_ext">Andere externe apps</string>
     <string name="cache_menu_streetview">Street View</string>
@@ -946,7 +951,6 @@
     <string name="gpx_import_loading_caches_with_filename">Laden van caches uit %1$s</string>
     <string name="gpx_import_loading_waypoints">Waypoints laden van .gpx bestand</string>
     <string name="gpx_import_loading_waypoints_with_filename">Laden van waypoints uit %1$s</string>
-    <string name="gpx_import_store_static_maps">Opslaan statische kaarten</string>
     <string name="gpx_import_caches_imported">Caches geïmporteerd</string>
     <string name="gpx_import_caches_imported_with_filename">%1$d caches geïmporteerd uit %2$s</string>
     <string name="gpx_import_static_maps_skipped">Downloaden van statische kaarten afgebroken</string>
@@ -1562,4 +1566,9 @@
     <string name="err_logimage_caption_required">Een bijschrift is vereist voor de afbeelding</string>
     <string name="waypoint_latitude_null">N/Z --° --.---</string>
     <string name="waypoint_longitude_null">O/W --° --.---</string>
+    <!-- permission handling -->
+    <string name="close_app">App sluiten</string>
+    <string name="ask_again">Opnieuw vragen</string>
+    <string name="location_permission_request_explanation">c:geo heeft toegang nodig tot de GPS op je apparaat om je positie te vinden en afstand en richting te berekenen naar geocaches. Het kan niet worden gebruikt zonder deze toestemming.</string>
+    <string name="storage_permission_request_explanation">c:geo zal gegevens schrijven op je telefoon opslag of SD kaart zodra je geocaches voor offline gebruik opslaat. Bovendien zal c:geo je telefoon opslag gebruiken voor het importeren en exporteren van bestanden en het lezen van offline kaarten. Het kan niet worden gebruikt zonder deze toestemming.</string>
 </resources>

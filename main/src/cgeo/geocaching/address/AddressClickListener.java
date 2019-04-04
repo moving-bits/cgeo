@@ -4,5 +4,6 @@ import android.location.Address;
 import android.support.annotation.NonNull;
 
 interface AddressClickListener {
-    void onClickAddress(@NonNull final Address address);
+    void onClickAddress(@NonNull Address address);
+    void onClickMapIcon(@NonNull Address address);
 }

@@ -158,6 +158,7 @@
     <string name="err_parse">Razčlenjevanje prijavne strani ni uspelo</string>
     <string name="err_server">Ni bilo mogoče vzpostaviti povezave z Geocaching.com. Spletna stran ali vaša povezava z internetom je lahko nedosegljiva.</string>
     <string name="err_server_ec">Povezava z Extremcaching.com ni uspela. Lahko vam povezava ne deluje ali pa je stran nedosegljiva.</string>
+    <string name="err_server_su">Unable to contact Geocaching.su. The website may be down or your internet connection not working.</string>
     <string name="err_server_gk">Ne morem se povezati na GeoKrety.org. Spletna stran je lahko nedosegljiva ali pa ne deluje internetna povezava.</string>
     <string name="err_login">Prijavni podatki niso shranjeni</string>
     <string name="err_login_failed_toast">c:geo se ne more prijaviti. c:geo lahko deluje v načinu brez povezave s shranjenimi zakladi. Preverite vaše prijavne podatke in internetno povezavo.</string>
@@ -196,6 +197,7 @@
     <string name="err_favorite_failed">Spreminjanje statusa favorita ni uspelo.</string>
     <string name="err_select_logimage_failed">Ni uspelo izbrati slike za zapis.</string>
     <string name="err_acquire_image_failed">Pridobivanje slike ni uspelo.</string>
+    <string name="err_unsupported_image_format">Unsupported image format.</string>
     <string name="err_tb_display">c:geo ne more prikazati željenega sledljivčka. Ali je res sledljivček?</string>
     <string name="err_tb_details_open">c:geo ne more pokazati podatke sledljivčka.</string>
     <string name="err_tb_not_loggable">Tega sledljivčka ni mogoče logirati.</string>
@@ -258,7 +260,6 @@
     <string name="info_log_report_problem_changed">Available problem reports have changed!</string>
     <string name="info_select_logimage_cancelled">Izbira slike je bila preklicana.</string>
     <string name="info_stored_image">Slika je bila shranjena v:</string>
-    <string name="info_storing_static_maps">Poskus shranjevanja statičnih zemljevidov</string>
     <string name="info_cache_saved">Zaklad je bil shranjen lokalno</string>
     <string name="warn_calculator_state_save">Be sure to save waypoint if you want to keep the calculator state.</string>
     <string name="err_trackable_log_not_anonymous">Logging %1$s from c:geo cannot be done anonymously. Do you want to open the settings to fill in your credentials from %2$s?</string>
@@ -431,6 +432,7 @@
     <string name="about_system_info">c:geo system information</string>
     <string name="about_system_info_send_chooser">Send system information</string>
     <string name="changelog_github">Seznam vseh sprememb</string>
+    <string name="about_nutshellmanual">Online manual</string>
     <!-- settings -->
     <string name="settings_title_open_settings">Odprem nastavitve?</string>
     <string name="settings_title_services">Storitve</string>
@@ -440,7 +442,7 @@
     <string name="settings_title_cachedetails">Podrobnosti zaklada</string>
     <string name="settings_summary_cachedetails">Customize the display of cache information.</string>
     <string name="settings_title_offlinedata">Podatki brez povezave</string>
-    <string name="settings_summary_offlinedata">Configure static maps and other offline data storage.</string>
+    <string name="settings_summary_offlinedata">Configure other offline data storage.</string>
     <string name="settings_title_logging">Zapisovanje</string>
     <string name="settings_summary_logging">Configure your signature and set logging options.</string>
     <string name="settings_title_map">Zemljevid</string>
@@ -468,6 +470,7 @@
     <string name="settings_goto_url_button">več …</string>
     <string name="settings_title_gc">Geocaching.com</string>
     <string name="settings_title_ec">Extremcaching.com</string>
+    <string name="settings_title_su">Geocaching.su</string>
     <string name="settings_title_ox">Opencaching.com (Garmin)</string>
     <string name="settings_activate_gc">Aktiviraj</string>
     <string name="settings_activate_ec">Aktiviraj</string>
@@ -561,12 +564,10 @@
     <string name="init_summary_exclude">Ne pokaži mojih ali najdenih zakladov v iskanjih ali na zemljevidu</string>
     <string name="init_showwaypoints">Dodatne točke na zemljevidu</string>
     <string name="init_showwaypoint_description">Če je manj kot določeno število zakladov na zemljevidu, se pokažejo tudi dodatne točke.</string>
+    <string name="init_brouterThreshold">Calculate route</string>
+    <string name="init_brouterThreshold_description">Maximum distance up to which brouter helper app (if installed) will calculate a route.</string>
     <string name="init_disabled">Ne pokaži onemogočenih zakladov v iskanjih ali na zemljevidu</string>
     <string name="init_summary_disabled">Ne pokaži onemogočenih zakladov</string>
-    <string name="init_offline">Statični zemljevidi zaklada</string>
-    <string name="init_summary_offline">Za delo brez povezave shrani tudi statične zemljevide zaklada</string>
-    <string name="init_offline_wp">Statični zemljevidi dodatnih točk</string>
-    <string name="init_summary_offline_wp">Za delo brez povezave shrani tudi statične zemljevide dodatnih točk</string>
     <string name="init_save_log_img">Slike iz zapisov</string>
     <string name="init_summary_save_log_img">Za delo brez povezave shrani tudi slike iz zapisov</string>
     <string name="init_units">Anglosaške merske enote</string>
@@ -692,8 +693,7 @@
     <!-- map sources -->
     <string name="map_source_google_map">Google: Cestni zemljevid</string>
     <string name="map_source_google_satellite">Google: Satelitska slika</string>
-    <string name="map_source_osm_mapnik">OSM: Mapnik</string>
-    <string name="map_source_osm_cyclemap">OSM: Kolesarski zemljevid</string>
+    <string name="map_source_osm_mapnik">OSM: Map</string>
     <string name="map_source_osm_offline">Zemljevid brez povezave</string>
     <string name="init_sendToCgeo">Pošlji v c:geo</string>
     <string name="settings_info_send2cgeo_title">Informacije o send2cgeo</string>
@@ -738,6 +738,8 @@
     <string name="auth_ocro">opencaching.ro</string>
     <string name="auth_ocuk">opencache.uk</string>
     <string name="auth_dialog_completed_oc">c:geo je sedaj povezan z %s.</string>
+    <!-- auth geocaching.su -->
+    <string name="auth_su">geocaching.su</string>
     <!-- auth geokrety -->
     <string name="auth_dialog_completed_geokrety">c:geo is now authorized to interact with %s.</string>
     <string name="err_auth_geokrety_bad_password">Your username/password seems invalid.</string>
@@ -813,6 +815,11 @@
     <string name="cache_description">Opis</string>
     <string name="cache_description_long">Daljši opis</string>
     <string name="cache_description_table_note">Opis vsebuje oblikovanje s tabelami. Za pravilen prikaz opisa bo mogoče potrebno obiskati %s.</string>
+    <string name="cache_area_description">Area Description</string>
+    <string name="cache_cache_description">Cache Description</string>
+    <string name="cache_virtual_description">Virtual Question</string>
+    <string name="cache_traditional_description">Traditional Part</string>
+    <string name="cache_box_description">Box Content</string>
     <string name="cache_watchlist_on">Zaklad je na vašem spisku nadzorov.</string>
     <string name="cache_watchlist_on_extra">This cache is on your watchlist (Watchers: %1d).</string>
     <string name="cache_watchlist_not_on">Zaklad ni na vašem spisku nadzorov.</string>
@@ -876,8 +883,6 @@
     <string name="cache_menu_radar">Radar</string>
     <string name="cache_menu_map">Zemljevid</string>
     <string name="cache_menu_mfbeta">Mapsforge Beta</string>
-    <string name="cache_menu_map_static">Statični zemljevidi</string>
-    <string name="cache_menu_download_map_static">Prenesi statične zemljevide</string>
     <string name="cache_menu_rmaps">Rmaps</string>
     <string name="cache_menu_map_ext">Druge zunanje aplikacije</string>
     <string name="cache_menu_streetview">Pogled ulic</string>
@@ -966,7 +971,6 @@
     <string name="gpx_import_loading_caches_with_filename">Nalaganje zakladov iz %1$s</string>
     <string name="gpx_import_loading_waypoints">Nalaganje dodatnih točk iz datoteke</string>
     <string name="gpx_import_loading_waypoints_with_filename">Nalaganje dodatnih točk iz %1$s</string>
-    <string name="gpx_import_store_static_maps">Shranjevanje statičnih zemljevidov</string>
     <string name="gpx_import_caches_imported">naloženih zakladov</string>
     <string name="gpx_import_caches_imported_with_filename">%1$d caches imported from %2$s</string>
     <string name="gpx_import_static_maps_skipped">prekinjeno nalaganje statičnih zemljevidov</string>
@@ -1606,4 +1610,9 @@
     <string name="err_logimage_caption_required">A caption is required for the image</string>
     <string name="waypoint_latitude_null">N/S --° --.---</string>
     <string name="waypoint_longitude_null">E/W --° --.---</string>
+    <!-- permission handling -->
+    <string name="close_app">Close app</string>
+    <string name="ask_again">Ask me again</string>
+    <string name="location_permission_request_explanation">c:geo needs access to the GPS on your device to locate your position and calculate distance and direction to geocaches. It cannot be used without this permission.</string>
+    <string name="storage_permission_request_explanation">c:geo will write data onto your phone storage or SD card as soon as you save geocaches for offline use. Furthermore c:geo will use your phone storage for import and export of files and reading of offline maps. It cannot be used without this permission.</string>
 </resources>

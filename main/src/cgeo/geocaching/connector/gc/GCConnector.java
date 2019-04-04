@@ -3,7 +3,6 @@ package cgeo.geocaching.connector.gc;
 import cgeo.geocaching.R;
 import cgeo.geocaching.SearchResult;
 import cgeo.geocaching.connector.AbstractConnector;
-import cgeo.geocaching.connector.ConnectorFactory;
 import cgeo.geocaching.connector.ILoggingManager;
 import cgeo.geocaching.connector.UserAction;
 import cgeo.geocaching.connector.capability.FieldNotesCapability;
@@ -33,7 +32,6 @@ import cgeo.geocaching.network.Network;
 import cgeo.geocaching.network.Parameters;
 import cgeo.geocaching.settings.Credentials;
 import cgeo.geocaching.settings.Settings;
-import cgeo.geocaching.settings.SettingsActivity;
 import cgeo.geocaching.storage.DataStore;
 import cgeo.geocaching.utils.DisposableHandler;
 import cgeo.geocaching.utils.Log;
@@ -58,9 +56,9 @@ public class GCConnector extends AbstractConnector implements ISearchByGeocode, 
 
     @NonNull
     private static final String CACHE_URL_SHORT = "https://coord.info/";
-    // Double slash is used to force open in browser
+
     @NonNull
-    private static final String CACHE_URL_LONG = "https://www.geocaching.com/seek/cache_details.aspx?wp=";
+    private static final String CACHE_URL_LONG = "https://www.geocaching.com/geocache/";
     /**
      * Pocket queries downloaded from the website use a numeric prefix. The pocket query creator Android app adds a
      * verbatim "pocketquery" prefix.
@@ -373,15 +371,6 @@ public class GCConnector extends AbstractConnector implements ISearchByGeocode, 
         // login
         final StatusCode status = GCLogin.getInstance().login();
 
-        if (ConnectorFactory.showLoginToast && handler != null) {
-            handler.sendMessage(handler.obtainMessage(0, status));
-            ConnectorFactory.showLoginToast = false;
-
-            // invoke settings activity to insert login details
-            if (status == StatusCode.NO_LOGIN_INFO_STORED && fromActivity != null) {
-                SettingsActivity.openForScreen(R.string.preference_screen_gc, fromActivity);
-            }
-        }
         return status == StatusCode.NO_ERROR;
     }
 
@@ -456,19 +445,19 @@ public class GCConnector extends AbstractConnector implements ISearchByGeocode, 
 
     @NonNull
     @Override
-    public List<UserAction> getUserActions(final UserAction.Context user) {
+    public List<UserAction> getUserActions(final UserAction.UAContext user) {
         final List<UserAction> actions = super.getUserActions(user);
-        actions.add(new UserAction(R.string.user_menu_open_browser, new Action1<UserAction.Context>() {
+        actions.add(new UserAction(R.string.user_menu_open_browser, new Action1<UserAction.UAContext>() {
 
             @Override
-            public void call(final UserAction.Context context) {
+            public void call(final UserAction.UAContext context) {
                 context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.geocaching.com/p/default.aspx?u=" + Network.encode(context.userName))));
             }
         }));
-        actions.add(new UserAction(R.string.user_menu_send_message, new Action1<UserAction.Context>() {
+        actions.add(new UserAction(R.string.user_menu_send_message, new Action1<UserAction.UAContext>() {
 
             @Override
-            public void call(final UserAction.Context context) {
+            public void call(final UserAction.UAContext context) {
                 context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.geocaching.com/email/?u=" + Network.encode(context.userName))));
             }
         }));

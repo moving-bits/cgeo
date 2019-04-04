@@ -1,10 +1,8 @@
 package cgeo.geocaching;
 
 import cgeo.geocaching.network.Cookies;
-import cgeo.geocaching.sensors.Sensors;
 import cgeo.geocaching.settings.Settings;
 import cgeo.geocaching.storage.DataStore;
-import cgeo.geocaching.utils.AndroidRxUtils;
 import cgeo.geocaching.utils.Log;
 import cgeo.geocaching.utils.OOMDumpingUncaughtExceptionHandler;
 
@@ -47,7 +45,7 @@ public class CgeoApplication extends Application {
 
         OOMDumpingUncaughtExceptionHandler.installUncaughtExceptionHandler();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             fixUserManagerMemoryLeak();
         }
 
@@ -61,19 +59,12 @@ public class CgeoApplication extends Application {
 
         // Restore cookies
         Cookies.restoreCookies();
-
-        final Sensors sensors = Sensors.getInstance();
-        sensors.setupGeoDataObservables(Settings.useGooglePlayServices(), Settings.useLowPowerMode());
-        sensors.setupDirectionObservable();
-
-        // Attempt to acquire an initial location before any real activity happens.
-        sensors.geoDataObservable(true).subscribeOn(AndroidRxUtils.looperCallbacksScheduler).take(1).subscribe();
     }
 
     /**
      * https://code.google.com/p/android/issues/detail?id=173789
      */
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void fixUserManagerMemoryLeak() {
         try {
             // invoke UserManager.get() via reflection

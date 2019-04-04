@@ -158,6 +158,7 @@
     <string name="err_parse">Не удалось разобрать страницу входа</string>
     <string name="err_server">Не удалось соединиться с Geocaching.co , возможно сайт не работает, или у вас отключено интернет соединение.</string>
     <string name="err_server_ec">Не удалось соединиться с Extremcaching.com , возможно сайт не работает, или у вас отключено интернет соединение.</string>
+    <string name="err_server_su">Не удалось соединиться с Geocaching.su, возможно сайт не работает, или у вас отключено интернет соединение.</string>
     <string name="err_server_gk">Не удается связаться с GeoKrety.org. Веб-сайт может быть недоступен или нет подключения к Интернету.</string>
     <string name="err_login">Нет сохраненной информации о пользователе</string>
     <string name="err_login_failed_toast">Не удается войти. c:geo будет работать оффлайн с сохраненными тайниками. Проверьте настройки входа или включите интернет-соединение.</string>
@@ -196,6 +197,7 @@
     <string name="err_favorite_failed">Изменение рекомендации не удалось.</string>
     <string name="err_select_logimage_failed">Выбор изображения для записи не удался.</string>
     <string name="err_acquire_image_failed">Ошибка при загрузке изображения.</string>
+    <string name="err_unsupported_image_format">Неподдерживаемый формат изображения.</string>
     <string name="err_tb_display">Не удалось отобразить искомый трекабл. Это точно трекабл?</string>
     <string name="err_tb_details_open">Не удалось получить информацию о трекабле.</string>
     <string name="err_tb_not_loggable">Этот трекабл не поддерживает записи.</string>
@@ -258,7 +260,6 @@
     <string name="info_log_report_problem_changed">Список доступных проблем изменился!</string>
     <string name="info_select_logimage_cancelled">Выбор изображения был отменен.</string>
     <string name="info_stored_image">Новое изображение сохранено в:</string>
-    <string name="info_storing_static_maps">Пытаемся сохранить статические карты</string>
     <string name="info_cache_saved">Тайник был сохранен локально</string>
     <string name="warn_calculator_state_save">Не забудьте сохранить точку, если вы хотите сохранить состояние калькулятора.</string>
     <string name="err_trackable_log_not_anonymous">Запись в %1$s из c:geo не может быть сделана анонимно. Вы хотите перейти в настройки и заполнить данные из %2$s?</string>
@@ -431,6 +432,7 @@
     <string name="about_system_info">Служебная информация c:geo</string>
     <string name="about_system_info_send_chooser">Отправить служебную информацию</string>
     <string name="changelog_github">Список всех изменений</string>
+    <string name="about_nutshellmanual">Оффлайн руководство</string>
     <!-- settings -->
     <string name="settings_title_open_settings">Открыть настройки?</string>
     <string name="settings_title_services">Сервисы</string>
@@ -440,7 +442,7 @@
     <string name="settings_title_cachedetails">Настройки тайников</string>
     <string name="settings_summary_cachedetails">Настройка отображения тайников.</string>
     <string name="settings_title_offlinedata">Сохраненные данные</string>
-    <string name="settings_summary_offlinedata">Настройка статических карт и других опций сохранения.</string>
+    <string name="settings_summary_offlinedata">Настроить другие места хранения.</string>
     <string name="settings_title_logging">Запись в блокнот</string>
     <string name="settings_summary_logging">Настройка подписи и записей в блокнот.</string>
     <string name="settings_title_map">Карта</string>
@@ -468,6 +470,7 @@
     <string name="settings_goto_url_button">Подробнее…</string>
     <string name="settings_title_gc">Geocaching.com</string>
     <string name="settings_title_ec">Extremcaching.com</string>
+    <string name="settings_title_su">Geocaching.su</string>
     <string name="settings_title_ox">Opencaching.com (Garmin)</string>
     <string name="settings_activate_gc">Активировать</string>
     <string name="settings_activate_ec">Активировать</string>
@@ -561,12 +564,10 @@
     <string name="init_summary_exclude">Исключить ваши собственные и найденные вами тайники</string>
     <string name="init_showwaypoints">Показ путевых точек</string>
     <string name="init_showwaypoint_description">Если на карте меньше заданного числа тайников, то их этапы будут показаны автоматически.</string>
+    <string name="init_brouterThreshold">Вычислить путь</string>
+    <string name="init_brouterThreshold_description">Максимальное расстояние, до которого brouter будет прокладывать маршрут (если установлен).</string>
     <string name="init_disabled">Исключить тайники вне игры</string>
     <string name="init_summary_disabled">Исключить тайники вне игры</string>
-    <string name="init_offline">Статические карты</string>
-    <string name="init_summary_offline">Сохранить статические карты для оффлайнового использования</string>
-    <string name="init_offline_wp">Статические карты (WP)</string>
-    <string name="init_summary_offline_wp">Сохранять путевые точки на статических картах для оффлайнового использования</string>
     <string name="init_save_log_img">Сохранять изображения</string>
     <string name="init_summary_save_log_img">Сохранять фотографии из блокнотов</string>
     <string name="init_units">Английские единицы</string>
@@ -692,8 +693,7 @@
     <!-- map sources -->
     <string name="map_source_google_map">Google: карта</string>
     <string name="map_source_google_satellite">Google: спутник</string>
-    <string name="map_source_osm_mapnik">OSM: Mapnik</string>
-    <string name="map_source_osm_cyclemap">OSM: Cyclemap</string>
+    <string name="map_source_osm_mapnik">OSM: Карта</string>
     <string name="map_source_osm_offline">Оффлайн</string>
     <string name="init_sendToCgeo">Send to c:geo</string>
     <string name="settings_info_send2cgeo_title">Подробная информация о send2cgeo</string>
@@ -738,6 +738,8 @@
     <string name="auth_ocro">opencaching.ro</string>
     <string name="auth_ocuk">opencache.uk</string>
     <string name="auth_dialog_completed_oc">c:geo теперь может взаимодействовать с %s.</string>
+    <!-- auth geocaching.su -->
+    <string name="auth_su">geocaching.su</string>
     <!-- auth geokrety -->
     <string name="auth_dialog_completed_geokrety">c:geo теперь может взаимодействовать с %s.</string>
     <string name="err_auth_geokrety_bad_password">Логин и\или пароль неверны.</string>
@@ -813,6 +815,11 @@
     <string name="cache_description">Описание</string>
     <string name="cache_description_long">Подробное описание</string>
     <string name="cache_description_table_note">Описание содержит табличное форматирование, для корректного просмотра вам может понадобиться %s.</string>
+    <string name="cache_area_description">Описание местности</string>
+    <string name="cache_cache_description">Описание тайника</string>
+    <string name="cache_virtual_description">\"Виртуальный\" вопрос</string>
+    <string name="cache_traditional_description">Традиционная часть тайника</string>
+    <string name="cache_box_description">Содержимое тайника</string>
     <string name="cache_watchlist_on">Этот тайник в вашем списке Отслеживаемых.</string>
     <string name="cache_watchlist_on_extra">Этот тайник в вашем списке Отслеживаемых (Наблюдателей: %1d).</string>
     <string name="cache_watchlist_not_on">Этот тайник не в Отслеживаемых.</string>
@@ -876,8 +883,6 @@
     <string name="cache_menu_radar">Радар</string>
     <string name="cache_menu_map">Карта</string>
     <string name="cache_menu_mfbeta">Бета Mapsforge</string>
-    <string name="cache_menu_map_static">Статическая карта</string>
-    <string name="cache_menu_download_map_static">Скачать статические карты</string>
     <string name="cache_menu_rmaps">Rmaps</string>
     <string name="cache_menu_map_ext">Другие внешние приложения</string>
     <string name="cache_menu_streetview">Просмотр улиц</string>
@@ -966,7 +971,6 @@
     <string name="gpx_import_loading_caches_with_filename">Загрузка тайников из %1$s</string>
     <string name="gpx_import_loading_waypoints">Загрузка файла точек</string>
     <string name="gpx_import_loading_waypoints_with_filename">Загрузка файла точек из %1$s</string>
-    <string name="gpx_import_store_static_maps">Сохранение статических карт</string>
     <string name="gpx_import_caches_imported">тайника (-ов) импортировано</string>
     <string name="gpx_import_caches_imported_with_filename">%1$d тайника (-ов) импортировано из %2$s</string>
     <string name="gpx_import_static_maps_skipped">Загрузка статических карт прервана</string>
@@ -1056,7 +1060,7 @@
     <string name="map_disabled_hide">Скрыть тайники вне игры</string>
     <string name="map_theme_builtin">По умолчанию</string>
     <string name="map_theme_select">Выбрать тему карты</string>
-    <string name="map_theme_options">Theme Options</string>
+    <string name="map_theme_options">Опции темы</string>
     <string name="map_live_enable">Подгружать тайники \"на лету\"</string>
     <string name="map_live_disable">Не подгружать тайники</string>
     <string name="map_static_title">Статические карты</string>
@@ -1134,7 +1138,7 @@
     <string name="trackable_travelbug">Travelbug</string>
     <string name="trackable_geokrety">ГеоКрот</string>
     <string name="trackable_geolutins">GeoLutins</string>
-    <string name="trackable_status">Status</string>
+    <string name="trackable_status">Статус</string>
     <string name="trackable_found">%1$s (%2$s)</string>
     <string name="geokret_type_traditional">Традиционный</string>
     <string name="geokret_type_book_or_media">Книга, CD или DVD</string>
@@ -1606,4 +1610,9 @@
     <string name="err_logimage_caption_required">Необходимо добавить подпись для изображения</string>
     <string name="waypoint_latitude_null">N/S --° --.---</string>
     <string name="waypoint_longitude_null">E/W --° --.---</string>
+    <!-- permission handling -->
+    <string name="close_app">Закрыть приложение</string>
+    <string name="ask_again">Спросить снова</string>
+    <string name="location_permission_request_explanation">c:geo необходим доступ к GPS чтобы определять ваше местоположение и отображать дистанцию и направление к тайникам. Приложение не может быть использовано без этого разрешения.</string>
+    <string name="storage_permission_request_explanation">c:geo необходим доступ к памяти телефона или SD карте, чтобы сохранять тайники, а также для чтения оффлайн карт и экспорта\импорта тайников. Приложение не может быть использовано без этого разрешения.</string>
 </resources>

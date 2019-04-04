@@ -158,6 +158,7 @@
     <string name="err_parse">Nieudany odczyt strony logowania.</string>
     <string name="err_server">Nieudane połączenie z Geocaching.com. Strona albo Twoje połączenie internetowe nie działa.</string>
     <string name="err_server_ec">Nieudane połączenie z Extremcaching.com. Strona albo Twoje połączenie internetowe nie działa.</string>
+    <string name="err_server_su">Unable to contact Geocaching.su. The website may be down or your internet connection not working.</string>
     <string name="err_server_gk">Nie można nawiązać połączenia ze stroną GeoKrety.org. Strona może nie działać albo nie masz połączenia z internetem.</string>
     <string name="err_login">Brak danych do logowania.</string>
     <string name="err_login_failed_toast">c:geo nie może zalogować się. c:geo pracuje offline z zapisanymi skrzynkami. Sprawdź ustawienia logowania i połączenie z internetem.</string>
@@ -196,6 +197,7 @@
     <string name="err_favorite_failed">Zmiana statusu skrzynki ulubiona nie powiodła się.</string>
     <string name="err_select_logimage_failed">Nie można wybrać obrazu.</string>
     <string name="err_acquire_image_failed">Nie można pobrać obrazu.</string>
+    <string name="err_unsupported_image_format">Unsupported image format.</string>
     <string name="err_tb_display">c:geo nie może pokazać przedmiotów podróżnych. Czy to naprawdę jest przedmiot podróżny?</string>
     <string name="err_tb_details_open">c:geo nie może otworzyć szczegółów przedmiotu podróżnego.</string>
     <string name="err_tb_not_loggable">Ten przedmiot podróżny nie jest do logowania.</string>
@@ -258,7 +260,6 @@
     <string name="info_log_report_problem_changed">Available problem reports have changed!</string>
     <string name="info_select_logimage_cancelled">Wybór obrazu został anulowany.</string>
     <string name="info_stored_image">Nowy obraz zapisany w:</string>
-    <string name="info_storing_static_maps">Próbuję zapisać mapy statyczne</string>
     <string name="info_cache_saved">Skrzynka jest przechowywana lokalnie</string>
     <string name="warn_calculator_state_save">Pamiętaj aby zapisać punkt orientacyjny jeśli chcesz zachować stan kalkulatora.</string>
     <string name="err_trackable_log_not_anonymous">Zalogowanie %1$s poprzez c:geo nie może być wykonane anonimowo. Czy chcesz otworzyć ustawienia, aby uzupełnić swoje dane do %2$s?</string>
@@ -431,6 +432,7 @@
     <string name="about_system_info">c:geo informacje systemowe</string>
     <string name="about_system_info_send_chooser">Wyślij informacje systemowe</string>
     <string name="changelog_github">Lista wszystkich zmian</string>
+    <string name="about_nutshellmanual">Online manual</string>
     <!-- settings -->
     <string name="settings_title_open_settings">Otworzyć ustawienia?</string>
     <string name="settings_title_services">Usługi</string>
@@ -440,7 +442,7 @@
     <string name="settings_title_cachedetails">Szczegóły skrzynki</string>
     <string name="settings_summary_cachedetails">Ustaw sposób wyświetlania informacji o skrzynce.</string>
     <string name="settings_title_offlinedata">Dane offline</string>
-    <string name="settings_summary_offlinedata">Skonfiguruj mapy statyczne i inne miejsca przechowywania danych offline.</string>
+    <string name="settings_summary_offlinedata">Configure other offline data storage.</string>
     <string name="settings_title_logging">Logowanie</string>
     <string name="settings_summary_logging">Skonfiguruj swój podpis i ustaw opcje logowania.</string>
     <string name="settings_title_map">Mapa</string>
@@ -468,6 +470,7 @@
     <string name="settings_goto_url_button">więcej …</string>
     <string name="settings_title_gc">Geocaching.com</string>
     <string name="settings_title_ec">Extremcaching.com</string>
+    <string name="settings_title_su">Geocaching.su</string>
     <string name="settings_title_ox">Opencaching.com (Garmin)</string>
     <string name="settings_activate_gc">Aktywuj</string>
     <string name="settings_activate_ec">Aktywuj</string>
@@ -561,12 +564,10 @@
     <string name="init_summary_exclude">Wyklucz własne lub już znalezione skrzynki</string>
     <string name="init_showwaypoints">Pokaż punkty nawigacji na mapie</string>
     <string name="init_showwaypoint_description">Jeśli mniej niż podana liczba skrzynek wyświetlana jest na mapie, ich punkty nawigacji są dodatkowo wyświetlane.</string>
+    <string name="init_brouterThreshold">Calculate route</string>
+    <string name="init_brouterThreshold_description">Maximum distance up to which brouter helper app (if installed) will calculate a route.</string>
     <string name="init_disabled">Wyklucz tymczasowo niedostępne skrzynki</string>
     <string name="init_summary_disabled">Wyklucz tymczasowo niedostępne skrzynki</string>
-    <string name="init_offline">Zapisuj mapy statyczne skrzynek do użytku offline</string>
-    <string name="init_summary_offline">Zapisuj mapy statyczne skrzynek do użytku offline</string>
-    <string name="init_offline_wp">Zapisuj mapy statyczne punktów nawigacji do użytku offline</string>
-    <string name="init_summary_offline_wp">Zapisuj mapy statyczne punktów nawigacji do użytku offline</string>
     <string name="init_save_log_img">Zapisz zdjęcia z wpisów</string>
     <string name="init_summary_save_log_img">Zapisz zdjęcia z wpisów</string>
     <string name="init_units">Używaj angielskich jednostek miary\n(mile)</string>
@@ -692,8 +693,7 @@
     <!-- map sources -->
     <string name="map_source_google_map">Google: Mapa</string>
     <string name="map_source_google_satellite">Google: Satelita</string>
-    <string name="map_source_osm_mapnik">OSM: Mapnik</string>
-    <string name="map_source_osm_cyclemap">OSM: Cyclemap</string>
+    <string name="map_source_osm_mapnik">OSM: Map</string>
     <string name="map_source_osm_offline">Offline</string>
     <string name="init_sendToCgeo">Wyślij do c:geo</string>
     <string name="settings_info_send2cgeo_title">Informacje o send2cgeo</string>
@@ -738,6 +738,8 @@
     <string name="auth_ocro">opencaching.ro</string>
     <string name="auth_ocuk">opencache.uk</string>
     <string name="auth_dialog_completed_oc">c:geo został zautoryzowany by komunikować się z %s.</string>
+    <!-- auth geocaching.su -->
+    <string name="auth_su">geocaching.su</string>
     <!-- auth geokrety -->
     <string name="auth_dialog_completed_geokrety">Aplikacja c:geo jest teraz upoważniona do interakcji z %s.</string>
     <string name="err_auth_geokrety_bad_password">Nazwa użytkownika lub hasło wygląda na nieprawidłowe.</string>
@@ -790,7 +792,7 @@
         <item quantity="one">about %d month ago</item>
         <item quantity="few">about %d months ago</item>
         <item quantity="many">about %d months ago</item>
-        <item quantity="other">about %d months ago</item>
+        <item quantity="other">około %d miesięcy temu</item>
     </plurals>
     <string name="cache_offline_about_time_year">ponad rok temu</string>
     <string name="cache_offline_time_hour">przed jedną godziną</string>
@@ -813,6 +815,11 @@
     <string name="cache_description">Opis</string>
     <string name="cache_description_long">Długi opis</string>
     <string name="cache_description_table_note">Opis zawiera formatowanie w formie tabeli, które w celu poprawnego wyświetlania może wymagać odwiedzenia %s.</string>
+    <string name="cache_area_description">Area Description</string>
+    <string name="cache_cache_description">Cache Description</string>
+    <string name="cache_virtual_description">Virtual Question</string>
+    <string name="cache_traditional_description">Traditional Part</string>
+    <string name="cache_box_description">Box Content</string>
     <string name="cache_watchlist_on">Ta skrzynka jest na Twojej liście obserwowanych.</string>
     <string name="cache_watchlist_on_extra">Ta skrzynka jest na Twojej liście obserwowanych (Obserwatorzy: %1d).</string>
     <string name="cache_watchlist_not_on">Ta skrzynka nie jest na Twojej liście obserwowanych.</string>
@@ -876,8 +883,6 @@
     <string name="cache_menu_radar">Radar</string>
     <string name="cache_menu_map">Pokaż na mapie</string>
     <string name="cache_menu_mfbeta">Mapsforge Beta</string>
-    <string name="cache_menu_map_static">Mapa statyczna</string>
-    <string name="cache_menu_download_map_static">Pobierz mapę statyczną</string>
     <string name="cache_menu_rmaps">Rmaps</string>
     <string name="cache_menu_map_ext">Inne aplikacje zewnętrzne</string>
     <string name="cache_menu_streetview">Street View</string>
@@ -966,7 +971,6 @@
     <string name="gpx_import_loading_caches_with_filename">Ładowanie skrzynek z %1$s</string>
     <string name="gpx_import_loading_waypoints">Ładuję plik z punktami nawigacji</string>
     <string name="gpx_import_loading_waypoints_with_filename">Ładowanie punktów orientacyjnych z %1$s</string>
-    <string name="gpx_import_store_static_maps">Zapisuję mapy statyczne</string>
     <string name="gpx_import_caches_imported">skrzynek importowanych</string>
     <string name="gpx_import_caches_imported_with_filename">%1$d skrzynek zostało importowane z %2$s</string>
     <string name="gpx_import_static_maps_skipped">Pobieranie map statycznych wstrzymane</string>
@@ -1056,7 +1060,7 @@
     <string name="map_disabled_hide">Ukryj nieaktywne skrzynki</string>
     <string name="map_theme_builtin">Domyślny</string>
     <string name="map_theme_select">Wybierz motyw mapy</string>
-    <string name="map_theme_options">Theme Options</string>
+    <string name="map_theme_options">Opcje motywu</string>
     <string name="map_live_enable">Włącz online</string>
     <string name="map_live_disable">Wyłącz online</string>
     <string name="map_static_title">Mapy statyczne</string>
@@ -1606,4 +1610,9 @@
     <string name="err_logimage_caption_required">Podpis jest wymagany dla obrazu</string>
     <string name="waypoint_latitude_null">N/S--°--.---</string>
     <string name="waypoint_longitude_null">E/W--°--.---</string>
+    <!-- permission handling -->
+    <string name="close_app">Close app</string>
+    <string name="ask_again">Ask me again</string>
+    <string name="location_permission_request_explanation">c:geo needs access to the GPS on your device to locate your position and calculate distance and direction to geocaches. It cannot be used without this permission.</string>
+    <string name="storage_permission_request_explanation">c:geo will write data onto your phone storage or SD card as soon as you save geocaches for offline use. Furthermore c:geo will use your phone storage for import and export of files and reading of offline maps. It cannot be used without this permission.</string>
 </resources>

@@ -1,17 +1,17 @@
 package cgeo.geocaching.network;
 
-import cgeo.geocaching.connector.oc.OCApiConnector;
+import cgeo.geocaching.connector.capability.IOAuthCapability;
 import cgeo.geocaching.settings.Settings;
+
+import android.support.annotation.NonNull;
+import android.util.Pair;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import android.support.annotation.NonNull;
-
-import android.util.Pair;
 
 public class OAuthTokens extends Pair<String, String> {
 
-    public OAuthTokens(@NonNull final OCApiConnector connector) {
+    public OAuthTokens(@NonNull final IOAuthCapability connector) {
         this(Settings.getTokenPair(connector.getTokenPublicPrefKeyId(), connector.getTokenSecretPrefKeyId()));
     }
 

@@ -1,7 +1,5 @@
 package cgeo.geocaching.settings;
 
-import butterknife.ButterKnife;
-
 import cgeo.geocaching.R;
 
 import android.content.Context;
@@ -12,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+
+import butterknife.ButterKnife;
 
 public class WpThresholdPreference extends Preference {
 
@@ -41,8 +41,8 @@ public class WpThresholdPreference extends Preference {
         final View v = super.onCreateView(parent);
 
         // get views
-        final SeekBar seekBar = ButterKnife.findById(v, R.id.wp_threshold_seekbar);
-        valueView = ButterKnife.findById(v, R.id.wp_threshold_value_view);
+        final SeekBar seekBar = ButterKnife.findById(v, R.id.preference_seekbar);
+        valueView = ButterKnife.findById(v, R.id.preference_seekbar_value_view);
 
         // init seekbar
         seekBar.setMax(Settings.SHOW_WP_THRESHOLD_MAX);

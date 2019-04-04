@@ -1,21 +1,19 @@
 package cgeo.geocaching.location;
 
+import static cgeo.geocaching.location.Viewport.containing;
+import static java.util.Collections.singleton;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
+import cgeo.geocaching.models.ICoordinates;
+
 import android.annotation.SuppressLint;
-
-
 import android.support.annotation.NonNull;
-
-import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import cgeo.geocaching.models.ICoordinates;
-
-import static cgeo.geocaching.location.Viewport.containing;
-import static java.util.Collections.singleton;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import org.junit.Test;
 
 public class ViewportTest {
 
@@ -89,7 +87,7 @@ public class ViewportTest {
     public void testEquals() {
         assertThat(vpRef).isEqualTo(vpRef);
         assertThat(new Viewport(vpRef.bottomLeft, vpRef.topRight)).isEqualTo(vpRef);
-        assertThat(vpRef.equals(new Viewport(new Geopoint(0.0, 0.0), 1.0, 1.0))).isFalse();
+        assertThat(new Viewport(new Geopoint(0.0, 0.0), 1.0, 1.0)).isNotEqualTo(vpRef);
     }
 
     @Test

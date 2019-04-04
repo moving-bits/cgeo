@@ -1,5 +1,7 @@
 package cgeo.geocaching.storage;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 import cgeo.CGeoTestCase;
 import cgeo.geocaching.SearchResult;
 import cgeo.geocaching.connector.gc.GCConnector;
@@ -22,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class DataStoreTest extends CGeoTestCase {
 
@@ -140,7 +141,7 @@ public class DataStoreTest extends CGeoTestCase {
 
         final String upperCase = ARTIFICIAL_GEOCODE;
         final String lowerCase = StringUtils.lowerCase(upperCase);
-        assertThat(upperCase.equals(lowerCase)).isFalse();
+        assertThat(upperCase).isNotEqualTo(lowerCase);
 
         // create cache and trackable
         final Geocache cache = new Geocache();

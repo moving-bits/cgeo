@@ -1,7 +1,5 @@
 package cgeo.geocaching.settings;
 
-import butterknife.ButterKnife;
-
 import cgeo.geocaching.R;
 import cgeo.geocaching.location.IConversion;
 
@@ -15,6 +13,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import java.util.Locale;
+
+import butterknife.ButterKnife;
 
 public class BrouterThresholdPreference extends Preference {
 
@@ -46,13 +46,21 @@ public class BrouterThresholdPreference extends Preference {
         ;
     }
 
+    private boolean atLeastOne(final SeekBar seekBar, final int progress) {
+        if (progress < 1) {
+            seekBar.setProgress(1);
+            return false;
+        }
+        return true;
+    }
+
     @Override
     protected View onCreateView(final ViewGroup parent) {
         final View v = super.onCreateView(parent);
 
         // get views
-        final SeekBar seekBar = ButterKnife.findById(v, R.id.brouter_threshold_seekbar);
-        valueView = ButterKnife.findById(v, R.id.brouter_threshold_value_view);
+        final SeekBar seekBar = ButterKnife.findById(v, R.id.preference_seekbar);
+        valueView = ButterKnife.findById(v, R.id.preference_seekbar_value_view);
 
         // init seekbar
         seekBar.setMax(Settings.BROUTER_THRESHOLD_MAX);
@@ -65,7 +73,7 @@ public class BrouterThresholdPreference extends Preference {
         seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(final SeekBar seekBar, final int progress, final boolean fromUser) {
-                if (fromUser) {
+                if (fromUser && atLeastOne(seekBar, progress)) {
                     valueView.setText(getValueString(progress));
                 }
             }
@@ -75,7 +83,9 @@ public class BrouterThresholdPreference extends Preference {
             }
             @Override
             public void onStopTrackingTouch(final SeekBar seekBar) {
-                Settings.setBrouterThreshold(seekBar.getProgress());
+                if (atLeastOne(seekBar, seekBar.getProgress())) {
+                    Settings.setBrouterThreshold(seekBar.getProgress());
+                }
             }
         });
 

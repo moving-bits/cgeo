@@ -156,9 +156,10 @@
     <!-- errors, warnings, info toasts -->
     <string name="err_none">Ok</string>
     <string name="err_parse">Hiba a bejelentkező oldalon</string>
-    <string name="err_server">Hiba a kapcsolatban a geocaching.com-mal (a szerver vagy a kapcsolat nem működik?)</string>
-    <string name="err_server_ec">Hiba a kapcsolatban az extremcaching.com-mal (a szerver vagy a kapcsolat nem működik?)</string>
-    <string name="err_server_gk">Nem lehet kapcsolódni a geokrety.org-hoz. A weboldal ideglenesen nem elérhető vagy az internetkapcsolatod nem működik.</string>
+    <string name="err_server">A geocaching.com nem érhető el. A webhely leállt, vagy az internetkapcsolat nem működik.</string>
+    <string name="err_server_ec">Az extremcaching.com nem érhető el. A webhely leállt, vagy az internetkapcsolat nem működik.</string>
+    <string name="err_server_su">A geocaching.su. nem érhető el. A webhely leállt, vagy az internetkapcsolat nem működik.</string>
+    <string name="err_server_gk">A geokrety.org nem érhető el. A webhely leállt, vagy az internetkapcsolat nem működik.</string>
     <string name="err_login">Hiányzó bejelentkezési adat</string>
     <string name="err_login_failed_toast">A c:geo nem tud bejelentkezni. A c:geo hálózat nélküli módban fut. Ellenőrizd a bejelentkezési adataidat a beállításoknál vagy engedélyezd az internetkapcsolatot!</string>
     <string name="err_unknown">Ismeretlen hiba</string>
@@ -196,6 +197,7 @@
     <string name="err_favorite_failed">Az állapotmódosítás sikertelen.</string>
     <string name="err_select_logimage_failed">Kép kiválasztása sikertelen.</string>
     <string name="err_acquire_image_failed">A kép készítése nem sikerült.</string>
+    <string name="err_unsupported_image_format">Nem támogatott képformátum.</string>
     <string name="err_tb_display">Sajnáljuk, a c:geo nem tudja megjeleníteni az utazót. Biztos, hogy ez egy utazó?</string>
     <string name="err_tb_details_open">Sajnáljuk, a c:geo nem tudja megnyitni az utazó adatait.</string>
     <string name="err_tb_not_loggable">Ezt az utazót nem lehet logolni.</string>
@@ -258,7 +260,6 @@
     <string name="info_log_report_problem_changed">Elérhető problémajelentések megváltoztak!</string>
     <string name="info_select_logimage_cancelled">A kép kiválasztása vagy készítése meg lett szakítva.</string>
     <string name="info_stored_image">Új kép mentési helyének megadása:</string>
-    <string name="info_storing_static_maps">Kísérlet a statikus térképek mentésére.</string>
     <string name="info_cache_saved">Láda adati letöltve</string>
     <string name="warn_calculator_state_save">Mentsd el az útpontot, ha meg akarod tartani a számológép aktuális állapotát!</string>
     <string name="err_trackable_log_not_anonymous">%1$s logolása a c:geo-ból nem végezhető el névtelenül. Meg akarod nyitni a beállításokat, hogy kitöltsd a %2$s-ra vonatkozó adatokat?</string>
@@ -292,10 +293,10 @@
     <string name="menu_scan_description">A c:geo QR formátumú geokódokat is be tud olvasni, de az ehhez szükséges alkalmazás nincs telepítve. Meg szeretnéd nyitni a Google Play-t, hogy telepítsd?</string>
     <!-- main screen -->
     <string name="live_map_button">Élő térkép</string>
-    <string name="caches_nearby_button">Közelben</string>
+    <string name="caches_nearby_button">A közelben</string>
     <string name="advanced_search_button">Keresés</string>
     <string name="stored_caches_button">Mentett</string>
-    <string name="any_button">Irány</string>
+    <string name="any_button">Cél</string>
     <string name="unknown_scan">Nem található geokód a szkennelés eredményében.</string>
     <!-- caches -->
     <string name="caches_no_cache">Nem található láda</string>
@@ -425,6 +426,7 @@
     <string name="about_system_info">c:geo rendszeradatok</string>
     <string name="about_system_info_send_chooser">Rendszeradatok küldése</string>
     <string name="changelog_github">Összes változtatás listázása</string>
+    <string name="about_nutshellmanual">Online kézikönyv</string>
     <!-- settings -->
     <string name="settings_title_open_settings">Beállítások megnyitása?</string>
     <string name="settings_title_services">Szolgáltatások</string>
@@ -434,7 +436,7 @@
     <string name="settings_title_cachedetails">Ládaadatok</string>
     <string name="settings_summary_cachedetails">A ládák megjelenő adatainak beállítása.</string>
     <string name="settings_title_offlinedata">Offline adatok</string>
-    <string name="settings_summary_offlinedata">Statikus térképek és más offline adatok tarolásának beállítása</string>
+    <string name="settings_summary_offlinedata">Egyéb offline adatok tárolójának beállítása.</string>
     <string name="settings_title_logging">Logolás</string>
     <string name="settings_summary_logging">Aláírásod és egyéb logolási opciók beállítása</string>
     <string name="settings_title_map">Térkép</string>
@@ -462,6 +464,7 @@
     <string name="settings_goto_url_button">Tovább…</string>
     <string name="settings_title_gc">Geocaching.com</string>
     <string name="settings_title_ec">Extremcaching.com</string>
+    <string name="settings_title_su">Geocaching.su</string>
     <string name="settings_title_ox">Opencaching.com (Garmin)</string>
     <string name="settings_activate_gc">Aktiválás</string>
     <string name="settings_activate_ec">Aktiválás</string>
@@ -555,12 +558,10 @@
     <string name="init_summary_exclude">Saját és megtalált ládák kihagyása</string>
     <string name="init_showwaypoints">Útpontok mutatása élő térképen</string>
     <string name="init_showwaypoint_description">Maximum ennyi útpontot mutasson</string>
+    <string name="init_brouterThreshold">Útvonaltervezés</string>
+    <string name="init_brouterThreshold_description">Maximális távolság, ameddig a brouter segítő alkalmazás (ha telepítve van) útvonaltervezést végez.</string>
     <string name="init_disabled">Letiltott ládák kihagyása</string>
     <string name="init_summary_disabled">Letiltott ládák kihagyása</string>
-    <string name="init_offline">Ládák statikus térképe</string>
-    <string name="init_summary_offline">Ládák statikus térképének mentése offline használathoz</string>
-    <string name="init_offline_wp">Útpontok statikus térképe</string>
-    <string name="init_summary_offline_wp">Útpontok statikus térképének mentése offline használathoz</string>
     <string name="init_save_log_img">Logokban található képek mentése</string>
     <string name="init_summary_save_log_img">Logokban található képek mentése</string>
     <string name="init_units">Mérföld/láb használata</string>
@@ -686,8 +687,7 @@
     <!-- map sources -->
     <string name="map_source_google_map">Google: Térkép</string>
     <string name="map_source_google_satellite">Google: Műholdkép</string>
-    <string name="map_source_osm_mapnik">OSM: Mapnik</string>
-    <string name="map_source_osm_cyclemap">OSM: Biciklis térkép</string>
+    <string name="map_source_osm_mapnik">OSM: Térkép</string>
     <string name="map_source_osm_offline">Offline</string>
     <string name="init_sendToCgeo">Send2cgeo</string>
     <string name="settings_info_send2cgeo_title">Információ a send2cgeo-ról</string>
@@ -732,6 +732,8 @@
     <string name="auth_ocro">opencaching.ro</string>
     <string name="auth_ocuk">opencache.uk</string>
     <string name="auth_dialog_completed_oc">%s: A c:geo engedélyt kapott az együttműködésre.</string>
+    <!-- auth geocaching.su -->
+    <string name="auth_su">geocaching.su</string>
     <!-- auth geokrety -->
     <string name="auth_dialog_completed_geokrety">%s: A c:geo engedélyt kapott az együttműködésre.</string>
     <string name="err_auth_geokrety_bad_password">A felhasználóneved/jelszavad helytelennek tűnik.</string>
@@ -795,6 +797,11 @@
     <string name="cache_description">Leírás</string>
     <string name="cache_description_long">Hosszú leírás</string>
     <string name="cache_description_table_note">A leírás táblázatot is tartalmaz. Lehetséges, hogy csak a %s jeleníti meg azt helyesen.</string>
+    <string name="cache_area_description">Terület leírása</string>
+    <string name="cache_cache_description">Láda leírása</string>
+    <string name="cache_virtual_description">Virtuális kérdés</string>
+    <string name="cache_traditional_description">Hagyományos rész</string>
+    <string name="cache_box_description">Doboz tartalma</string>
     <string name="cache_watchlist_on">Ez a láda a figyelőlistádon van.</string>
     <string name="cache_watchlist_on_extra">Ez a láda a figyelőlistádon van (figyelők száma: %1d).</string>
     <string name="cache_watchlist_not_on">Ez a láda nincs a figyelőlistádon.</string>
@@ -856,8 +863,6 @@
     <string name="cache_menu_radar">Radar</string>
     <string name="cache_menu_map">Térkép</string>
     <string name="cache_menu_mfbeta">Mapsforge béta</string>
-    <string name="cache_menu_map_static">Statikus térképek</string>
-    <string name="cache_menu_download_map_static">Statikus térképek letöltése</string>
     <string name="cache_menu_rmaps">Rmaps</string>
     <string name="cache_menu_map_ext">Külső alkalmazás</string>
     <string name="cache_menu_streetview">Utcanézet</string>
@@ -946,7 +951,6 @@
     <string name="gpx_import_loading_caches_with_filename">%1$s: ládák betöltése</string>
     <string name="gpx_import_loading_waypoints">Útpontfájl betöltése</string>
     <string name="gpx_import_loading_waypoints_with_filename">%1$s: útpontok betöltése</string>
-    <string name="gpx_import_store_static_maps">Statikus térképek mentése</string>
     <string name="gpx_import_caches_imported">láda importálva</string>
     <string name="gpx_import_caches_imported_with_filename">%1$d láda importálva %2$s fájlból</string>
     <string name="gpx_import_static_maps_skipped">A statikus térképek letöltése megszakítva.</string>
@@ -1036,7 +1040,7 @@
     <string name="map_disabled_hide">Letiltott ládák ki</string>
     <string name="map_theme_builtin">Alapértelmezett</string>
     <string name="map_theme_select">Térképstílusok</string>
-    <string name="map_theme_options">Theme Options</string>
+    <string name="map_theme_options">Térképstílus beállítások</string>
     <string name="map_live_enable">Élő mód</string>
     <string name="map_live_disable">Élő mód vége</string>
     <string name="map_static_title">Statikus térképek</string>
@@ -1114,7 +1118,7 @@
     <string name="trackable_travelbug">Travelbug</string>
     <string name="trackable_geokrety">GeoKrety</string>
     <string name="trackable_geolutins">GeoLutins</string>
-    <string name="trackable_status">Status</string>
+    <string name="trackable_status">Állapot</string>
     <string name="trackable_found">%1$s (%2$s)</string>
     <string name="geokret_type_traditional">Hagyományos</string>
     <string name="geokret_type_book_or_media">Könyv vagy elektronikus média</string>
@@ -1381,7 +1385,7 @@
     <string name="attribute_arithmetic_no">Nem számtani feladat</string>
     <string name="attribute_other_cache_yes">Egyéb ládatípus</string>
     <string name="attribute_other_cache_no">Nem egyéb ládatípus</string>
-    <string name="attribute_ask_owner_yes">Tulajdonost megkérdezni az indulási feltételekről</string>
+    <string name="attribute_ask_owner_yes">Tulajdonos megkérdezése az indulási feltételekről</string>
     <string name="attribute_ask_owner_no">Tulajdonost nem kell megkérdezni az indulási feltételekről</string>
     <string name="attribute_unknown_yes">Ismeretlen tulajdonság</string>
     <string name="attribute_unknown_no">Nincs ismeretlen tulajdonság</string>
@@ -1562,4 +1566,9 @@
     <string name="err_logimage_caption_required">Képfelirat megadása szükséges</string>
     <string name="waypoint_latitude_null">N/S --° --.---</string>
     <string name="waypoint_longitude_null">E/W --° --.---</string>
+    <!-- permission handling -->
+    <string name="close_app">App bezárása</string>
+    <string name="ask_again">Újrakérdezés</string>
+    <string name="location_permission_request_explanation">A c:geo-nak szüksége van készüléked GPS-ének használatára, hogy megállapíthassa helyzetedet, a ládák irányát, távolságát. Ez az engedély nélkül nem lehetséges.</string>
+    <string name="storage_permission_request_explanation">A c:geo adatokat tárol készülékeden vagy SD kártyádon, ha ládákat mentesz el offline használatra. Továbbá használja készüléked tárhelyét fájlok importálásakor/exportálásakor, valamint offline térképek olvasásakor. Ez az engedély nélkül nem lehetséges.</string>
 </resources>

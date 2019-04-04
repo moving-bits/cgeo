@@ -1,18 +1,20 @@
 package cgeo.geocaching.maps.mapsforge;
 
+import cgeo.geocaching.R;
 import cgeo.geocaching.activity.ActivityMixin;
 import cgeo.geocaching.activity.FilteredActivity;
 import cgeo.geocaching.maps.AbstractMap;
 import cgeo.geocaching.maps.CGeoMap;
 import cgeo.geocaching.maps.interfaces.MapActivityImpl;
-
-import org.mapsforge.v3.android.maps.MapActivity;
+import cgeo.geocaching.settings.Settings;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import org.mapsforge.v3.android.maps.MapActivity;
 
 public class MapsforgeMapActivity extends MapActivity implements MapActivityImpl, FilteredActivity {
 
@@ -22,6 +24,14 @@ public class MapsforgeMapActivity extends MapActivity implements MapActivityImpl
         mapBase = new CGeoMap(this);
     }
 
+    @Override
+    public void setTheme(final int resid) {
+        if (Settings.isLightSkin()) {
+            super.setTheme(R.style.cgeo_gmap_light);
+        } else {
+            super.setTheme(R.style.cgeo_gmap);
+        }
+    }
     @Override
     public Activity getActivity() {
         return this;

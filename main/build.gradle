@@ -18,17 +18,19 @@ if (isContinuousIntegrationServer()) {
 }
 
 android {
-    compileSdkVersion "Google Inc.:Google APIs:23"
+    compileSdkVersion "Google Inc.:Google APIs:24"
+
+    buildToolsVersion "28.0.3"
 
     compileOptions {
         // use the diamond operator and some other goodies in Android
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 22
+        minSdkVersion 16
+        targetSdkVersion 27
         versionName versionNameFromDate()
         versionCode versionCodeFromDate(0)
 
@@ -241,18 +243,19 @@ android {
 
 dependencies {
     // AndroidAnnotations, https://github.com/excilys/androidannotations/wiki/building-project-gradle
-    def androidAnnotationsVersion = '4.5.2'
+    def androidAnnotationsVersion = '4.6.0'
     annotationProcessor "org.androidannotations:androidannotations:$androidAnnotationsVersion"
     implementation "org.androidannotations:androidannotations-api:$androidAnnotationsVersion"
 
     // Apache Commons
-    implementation 'org.apache.commons:commons-collections4:4.1'
-    implementation 'org.apache.commons:commons-compress:1.14'
+    implementation 'org.apache.commons:commons-collections4:4.3'
+    implementation 'org.apache.commons:commons-compress:1.18'
     implementation 'commons-io:commons-io:2.5'
-    implementation 'org.apache.commons:commons-lang3:3.5'
+    implementation 'org.apache.commons:commons-lang3:3.8.1'
+    implementation 'org.apache.commons:commons-text:1.6'
 
     // AssertJ for testing, needed both for local unit tests and Android instrumentation tests
-    def assertJVersion = '2.9.0'
+    def assertJVersion = '2.9.1'
     testImplementation "org.assertj:assertj-core:$assertJVersion"
     androidTestImplementation "org.assertj:assertj-core:$assertJVersion"
 
@@ -271,7 +274,7 @@ dependencies {
     implementation "net.sf.geographiclib:GeographicLib-Java:1.49"
 
     // Jackson XML processing
-    def jacksonVersion = '2.9.5'
+    def jacksonVersion = '2.9.6'
     implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
     implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
@@ -292,12 +295,12 @@ dependencies {
     testImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanaryVersion"
 
     // Locus Maps integration
-    implementation "com.asamm:locus-api:0.2.15"
+    implementation "com.asamm:locus-api:0.2.25"
     implementation "com.asamm:locus-api-android:0.2.15"
 
     // Mapsforge old version
     implementation files('libs/mapsforge-map-0.3.0-jar-with-dependencies.jar')
-    implementation 'com.caverock:androidsvg:1.2.2-beta-1'
+    implementation 'com.caverock:androidsvg:1.3'
 
     // Mapsforge new version
     def mapsforgeVersion = '0.9.1'
@@ -316,11 +319,11 @@ dependencies {
     // Metadata Extractor, EXIF location extraction from images
     implementation 'com.drewnoakes:metadata-extractor:2.11.0'
 
-    // Okhttp network access
+    // Okhttp network access. 3.12.x is API level < 21, 3.13 or better requires API 21
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
 
     // Play Services
-    def playServicesVersion = '9.4.0'
+    def playServicesVersion = '10.0.1'
     implementation "com.google.android.gms:play-services-location:$playServicesVersion"
     implementation "com.google.android.gms:play-services-appinvite:$playServicesVersion"
     // somehow there is a transitive play service dependency which we don't want
@@ -330,14 +333,15 @@ dependencies {
     implementation 'com.jakewharton:process-phoenix:2.0.0'
 
     // RxJava
-    implementation "io.reactivex.rxjava2:rxjava:2.2.0"
-    implementation "io.reactivex.rxjava2:rxandroid:2.0.2"
+    implementation "io.reactivex.rxjava2:rxjava:2.2.8"
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
 
     // Support Library. Appcompat
-    implementation 'com.android.support:appcompat-v7:20.0.0'
+    def appcompatVersion = '24.2.1'
+    implementation "com.android.support:appcompat-v7:$appcompatVersion"
 
     // Support Library RecyclerView
-    implementation 'com.android.support:recyclerview-v7:22.0.0'
+    implementation "com.android.support:recyclerview-v7:$appcompatVersion"
     // we don't want to implement decorators on our own
     implementation 'com.yqritc:recyclerview-flexibledivider:1.4.0'
 
@@ -361,7 +365,7 @@ dependencies {
     implementation 'com.google.zxing:android-integration:3.3.0'
 
     // GridLayout used by the coordinate calculator
-    implementation 'com.android.support:gridlayout-v7:23.0.1'
+    implementation "com.android.support:gridlayout-v7:$appcompatVersion"
 
     // Espresso TODO: disabled because of causing proguard errors en masse (due to including hamcrest and what else as own dependencies)
     // androidTestCompile 'com.jakewharton.espresso:espresso:1.1-r3'
@@ -387,7 +391,9 @@ project.afterEvaluate{
     preBuild.dependsOn("verifyCgeoKeys")
 }
 
-task verifyCgeoKeys {
+tasks.register('verifyCgeoKeys') {
+    group = 'verification'
+    description = 'Checks for the existence of keys.xml to successfully compile cgeo.'
     doFirst {
         def keysFile = file("res/values/keys.xml")
         if (!keysFile.exists()) {
@@ -410,11 +416,6 @@ task verifyCgeoKeys {
             throw new InvalidUserDataException("You must provide API keys for c:geo to compile successfully. Please read the 'API keys' section in the README.md file for further details.")
         }
     }
-}
-
-configure (verifyCgeoKeys) {
-    group = 'verification'
-    description = 'Checks for the existence of keys.xml to successfully compile cgeo.'
 }
 
 
@@ -467,10 +468,11 @@ static def isContinuousIntegrationServer() {
  * have a run task for our builds to launch the app directly from gradle
  */
 android.applicationVariants.all { variant ->
-    if (variant.install) {
-        tasks.create(name: "run${variant.name.capitalize()}", dependsOn: variant.install) {
+    if (variant.installProvider) {
+        tasks.register("run${variant.name.capitalize()}") {
             group 'cgeo'
             description "Installs the ${variant.description} and runs the main activity. Depends on 'adb' being on the PATH."
+            dependsOn tasks.named(variant.installProvider.name)
 
             doFirst {
                 def classpath = variant.applicationId
@@ -494,6 +496,7 @@ android.applicationVariants.all { variant ->
 }
 
 // run device and non device tests together with one task. also fixes the bug that gradle optimizes tests away in repeated runs
+// FIXME: This uses eager task creation API. Found no way to configure a set of dependsOn with the new API.
 tasks.create(name: "testDebug", dependsOn: [ "testBasicDebugUnitTest", "connectedBasicDebugAndroidTest" ]) {
     group 'cgeo'
     description "Tests the debug build both with device-dependent and device-independent tests."
@@ -520,7 +523,7 @@ if (privatePropertiesFile.exists()) {
 }
 
 // check existence of private properties, show an error message
-task verifyPrivateProperties {
+tasks.register('verifyPrivateProperties') {
     doLast {
         if (!rootProject.file('private.properties').exists()) {
             throw new InvalidUserDataException("For signing the release build you must provide a file private.properties in the root directory. Copy templates/private.properties and change the values.")
@@ -529,7 +532,8 @@ task verifyPrivateProperties {
 }
 
 // copy preferences containing user and password to the device
-task copyDefaultPreferencesToAndroid(dependsOn: 'installBasicDebug') {
+tasks.register('copyDefaultPreferencesToAndroid') {
+    dependsOn 'installBasicDebug'
     doFirst {
         def preferences = file('cgeo.geocaching_preferences.xml')
         if (preferences.exists()) {
@@ -574,106 +578,20 @@ tasks.whenTaskAdded { theTask ->
     }
 }
 
-def downloadFromMaven(mavenFilePath, localFilePath) {
-    def localFile = new File(localFilePath)
-    if (!localFile.exists()) {
-        try {
-            new URL("https://search.maven.org/remotecontent?filepath=${mavenFilePath}").withInputStream { i ->
-                localFile.withOutputStream {
-                    it << i
-                }
-            }
-        }
-        catch (FileNotFoundException e) {
-            println(e.message)
-        }
-    }
-}
-
-def unzipAAR(aarFileName) {
-    def dir = new File(".\\libs")
-    def aarFile = new File(dir, aarFileName)
-    ant.unzip( src: aarFile, dest: dir, overwrite: "true" ) {
-        patternset( ) {
-            include( name: 'classes.jar' )
-        }
-
-    }
-    def libName = aarFileName.substring(0, aarFileName.length() - 3) + "jar"
-    def extractedFile = new File(".\\main\\libs", 'classes.jar')
-    def renamedFile = new File(".\\main\\libs", libName)
-    extractedFile.renameTo(renamedFile)
-    new File(".\\main\\libs", aarFileName).delete()
-}
-
-task downloadLibs {
-    group "cgeo"
-    description "Downloads the dependency JARs for use with Eclipse"
-    doFirst {
-        configurations.implementation.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
-            if (artifact.extension == 'jar' || artifact.extension == 'aar') {
-                project.copy {
-                    from artifact.file
-                    into "libs"
-                }
-            }
-            if (artifact.extension == 'aar') {
-                unzipAAR(artifact.file.name)
-            }
-        }
-
-        // download javadoc
-        new File(".\\main\\libs\\src").mkdirs()
-        configurations.implementation.dependencies.each { Dependency dependency ->
-            try {
-                def vendor = dependency.group.replace(".","/")
-                def version = dependency.version
-                def name = dependency.name
-                downloadFromMaven("${vendor}/${name}/${version}/${name}-${version}-javadoc.jar", ".\\main\\libs\\src\\${name}-${version}-javadoc.jar")
-                downloadFromMaven("${vendor}/${name}/${version}/${name}-${version}-sources.jar", ".\\main\\libs\\src\\${name}-${version}-sources.jar")
-                def propFile = new File(".\\main\\libs\\${name}-${version}.jar.properties")
-                if (!propFile.exists()) {
-                    propFile.write("src=src/${name}-${version}-sources.jar\ndoc=src/${name}-${version}-javadoc.jar\n")
-                }
-            }
-            catch (RuntimeException e) {
-                // ???
-                println(e.message)
-            }
-        }
-
-        // remove unwanted artifacts
-        delete fileTree('libs') {
-            include '**/library-*' // transitive dependency?
-            include '**/xmpcore*' // transitive dependency?
-            include '**/*androidannotations-api-4*' // Eclipse can only deal with AndroidAnnotations 3.x
-            // Play Services are real Eclipse projects
-            include '**/*play-services*'
-            exclude '**/play-services-appinvite*' // except this one
-
-            // more real Eclipse projects
-            include '**/*mapswithme*'
-            include '**/viewpagerindicator*'
-
-            // Support libraries as Eclipse projects because they contain resources
-            include '**/recyclerview-v7*'
-            include '**/appcompat-v7*'
-            include '**/support-v4*'
-        }
-    }
-}
-
 apply plugin: 'checkstyle'
 
-check.dependsOn 'checkstyle'
-
-task checkstyle(type: Checkstyle) {
+tasks.register('checkstyle', Checkstyle) {
     configFile file("${project.rootDir}/checkstyle.xml")
     source 'src'
     include '**/*.java'
 
     classpath = files()
 }
+
+tasks.named('check') {
+    dependsOn tasks.named('checkstyle')
+}
+
 
 /*
  * Ribbonizer, adds ribbons to launcher icon of debug builds

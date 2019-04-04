@@ -14,10 +14,12 @@ import cgeo.geocaching.models.CalcState;
 import cgeo.geocaching.models.Geocache;
 import cgeo.geocaching.models.Waypoint;
 import cgeo.geocaching.network.SmileyImage;
+import cgeo.geocaching.permission.PermissionHandler;
+import cgeo.geocaching.permission.PermissionRequestContext;
+import cgeo.geocaching.permission.RestartLocationPermissionGrantedCallback;
 import cgeo.geocaching.sensors.GeoData;
 import cgeo.geocaching.sensors.GeoDirHandler;
 import cgeo.geocaching.settings.Settings;
-import cgeo.geocaching.staticmaps.StaticMapsProvider;
 import cgeo.geocaching.storage.DataStore;
 import cgeo.geocaching.ui.WeakReferenceHandler;
 import cgeo.geocaching.ui.dialog.CoordinatesInputDialog;
@@ -56,7 +58,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -109,7 +110,6 @@ public class EditWaypointActivity extends AbstractActionBarActivity implements C
     private String lookup = "---";
     private boolean own = true;
     private boolean originalCoordsEmpty = false;
-    private List<String> distanceUnits = null;
 
     /**
      * {@code true} if the activity is newly created, {@code false} if it is restored from an instance state
@@ -286,7 +286,17 @@ public class EditWaypointActivity extends AbstractActionBarActivity implements C
 
     @Override
     public void onResume() {
-        super.onResume(geoDirHandler.start(GeoDirHandler.UPDATE_GEODATA));
+        super.onResume();
+
+        // resume location access
+        PermissionHandler.executeIfLocationPermissionGranted(this,
+                new RestartLocationPermissionGrantedCallback(PermissionRequestContext.EditWaypointActivity) {
+
+                    @Override
+                    public void executeAfter() {
+                        resumeDisposables(geoDirHandler.start(GeoDirHandler.UPDATE_GEODATA));
+                    }
+                });
     }
 
     @Override
@@ -337,6 +347,7 @@ public class EditWaypointActivity extends AbstractActionBarActivity implements C
 
             @Override
             public void onNothingSelected(final AdapterView<?> parent) {
+                // empty
             }
         });
 
@@ -367,7 +378,6 @@ public class EditWaypointActivity extends AbstractActionBarActivity implements C
     }
 
     private void initializeDistanceUnitSelector() {
-        distanceUnits = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.distance_units)));
         if (initViews) {
             distanceUnitSelector.setSelection(Settings.useImperialUnits() ?
                     DistanceParser.DistanceUnit.FT.getValue() : DistanceParser.DistanceUnit.M.getValue());
@@ -708,14 +718,7 @@ public class EditWaypointActivity extends AbstractActionBarActivity implements C
             finishHandler.sendEmptyMessage(SAVE_ERROR);
             return;
         }
-        final Waypoint oldWaypoint = cache.getWaypointById(waypointId);
         if (cache.addOrChangeWaypoint(waypoint, true)) {
-            if (!StaticMapsProvider.hasAllStaticMapsForWaypoint(geocode, waypoint)) {
-                StaticMapsProvider.removeWpStaticMaps(oldWaypoint, geocode);
-                if (Settings.isStoreOfflineWpMaps()) {
-                    StaticMapsProvider.storeWaypointStaticMap(cache, waypoint).subscribe();
-                }
-            }
             if (waypoint.getCoords() != null && (modifyLocal.isChecked() || modifyBoth.isChecked())) {
                 if (!cache.hasUserModifiedCoords()) {
                     final Waypoint origWaypoint = new Waypoint(CgeoApplication.getInstance().getString(R.string.cache_coordinates_original), WaypointType.ORIGINAL, false);

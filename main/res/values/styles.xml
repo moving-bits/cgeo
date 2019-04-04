@@ -9,9 +9,13 @@
         <item name="android:singleLine">true</item>
         <item name="android:scrollHorizontally">true</item>
         <item name="android:ellipsize">marquee</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:textColor">?text_color</item>
         <item name="android:background">?button</item>
+    </style>
+
+    <style name="button_borderless" parent="button">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>
 
     <style name="edittext" parent="@android:style/Widget.EditText">
@@ -97,6 +101,16 @@
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
 
+        <item name="android:layout_marginLeft">10dip</item>
+        <item name="android:layout_marginRight">10dip</item>
+        <item name="android:layout_marginBottom">5dip</item>
+    </style>
+
+    <!-- button: letter -->
+    <style name="button_letter" parent="button">
+        <item name="android:layout_width">40sp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">22sp</item>
         <item name="android:layout_marginLeft">10dip</item>
         <item name="android:layout_marginRight">10dip</item>
         <item name="android:layout_marginBottom">5dip</item>
@@ -361,5 +375,12 @@
         <item name="android:stepSize">0.5</item>
         <item name="android:isIndicator">true</item>
     </style>
-    
+
+    <!-- progress dialog theme -->
+    <style name="cgeoProgressdialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:textColorPrimary">?text_color</item>
+        <item name="android:textColor">?text_color</item>
+        <item name="android:windowBackground">@drawable/border_straight</item>
+        <item name="buttonBarButtonStyle">@style/button_borderless</item>
+    </style>
 </resources>

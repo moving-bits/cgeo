@@ -158,6 +158,7 @@
     <string name="err_parse">Misslyckades att analysera inloggningssidan</string>
     <string name="err_server">Misslyckades att ansluta till Geocaching.com. Hemsidan kan vara ur funktion eller så är det problem med din anslutning till Internet.</string>
     <string name="err_server_ec">Det gick inte att kontakta Extremcaching.com. Webbplatsen kan ha problem eller så fungerar inte din internet-anslutning.</string>
+    <string name="err_server_su">Unable to contact Geocaching.su. The website may be down or your internet connection not working.</string>
     <string name="err_server_gk">Det gick inte att kontakta GeoKrety.org. Webbplatsen kan vara nere eller så fungerar inte din internet-anslutning.</string>
     <string name="err_login">Inloggningsinformationen ej sparad</string>
     <string name="err_login_failed_toast">Tyvärr kan c:geo inte logga in. c:geo kommer att köra i offline läge med sparade cacher. Kontrollera dina inloggningsuppgifter och aktivera din internetanslutning.</string>
@@ -196,6 +197,7 @@
     <string name="err_favorite_failed">Misslyckades att ändra favoritstatus.</string>
     <string name="err_select_logimage_failed">Misslyckades att välja bild till loggen.</string>
     <string name="err_acquire_image_failed">Hämtning av bilden misslyckades.</string>
+    <string name="err_unsupported_image_format">Unsupported image format.</string>
     <string name="err_tb_display">Tyvärr kan c:geo inte visa den trackable du önskar. Är den verkligen trackable?</string>
     <string name="err_tb_details_open">Tyvärr kan c:geo inte öppna detaljer för trackable.</string>
     <string name="err_tb_not_loggable">Detta spårbara objekt är inte loggbart.</string>
@@ -258,7 +260,6 @@
     <string name="info_log_report_problem_changed">Tillgängliga problemrapporter har förändrats!</string>
     <string name="info_select_logimage_cancelled">Val av bild avbröts.</string>
     <string name="info_stored_image">Ny bild sparad som:</string>
-    <string name="info_storing_static_maps">Försöker ladda ner statiska kartor</string>
     <string name="info_cache_saved">Cachen har lagrats lokalt</string>
     <string name="warn_calculator_state_save">Glöm inte att spara punkten om du vill behålla kalkylatorläget.</string>
     <string name="err_trackable_log_not_anonymous">Loggning av %1$s från c:geo kan inte göras anonymt. Vill du öppna inställningarna för att fylla i din inloggningsinformation från %2$s?</string>
@@ -425,6 +426,7 @@
     <string name="about_system_info">c:geo systeminformation</string>
     <string name="about_system_info_send_chooser">Skicka systeminformation</string>
     <string name="changelog_github">Lista över alla ändringar</string>
+    <string name="about_nutshellmanual">Online manual</string>
     <!-- settings -->
     <string name="settings_title_open_settings">Öppna inställningar?</string>
     <string name="settings_title_services">Tjänster</string>
@@ -434,7 +436,7 @@
     <string name="settings_title_cachedetails">Cachedetaljer</string>
     <string name="settings_summary_cachedetails">Anpassa utseende på cacheinformation.</string>
     <string name="settings_title_offlinedata">Offlinedata</string>
-    <string name="settings_summary_offlinedata">Konfigurera statiska kartor och annan offline datalagring.</string>
+    <string name="settings_summary_offlinedata">Configure other offline data storage.</string>
     <string name="settings_title_logging">Loggning</string>
     <string name="settings_summary_logging">Konfigurera din signatur och andra loggningsinställningar.</string>
     <string name="settings_title_map">Karta</string>
@@ -462,6 +464,7 @@
     <string name="settings_goto_url_button">mer …</string>
     <string name="settings_title_gc">Geocaching.com</string>
     <string name="settings_title_ec">Extremcaching.com</string>
+    <string name="settings_title_su">Geocaching.su</string>
     <string name="settings_title_ox">Opencaching.com (Garmin)</string>
     <string name="settings_activate_gc">Aktivera</string>
     <string name="settings_activate_ec">Aktivera</string>
@@ -555,12 +558,10 @@
     <string name="init_summary_exclude">Dölj egna och hittade cacher</string>
     <string name="init_showwaypoints">Extra punkter på kartan</string>
     <string name="init_showwaypoint_description">Gräns för antal cacher där extra punkter (parkering eller tillagd lösning) börjar visas i kartan.</string>
+    <string name="init_brouterThreshold">Calculate route</string>
+    <string name="init_brouterThreshold_description">Maximum distance up to which brouter helper app (if installed) will calculate a route.</string>
     <string name="init_disabled">Inaktiva cacher</string>
     <string name="init_summary_disabled">Dölj inaktiva cacher</string>
-    <string name="init_offline">Kartor till cacher</string>
-    <string name="init_summary_offline">Spara kartor för cacher för användning offline</string>
-    <string name="init_offline_wp">Kartor för punkter</string>
-    <string name="init_summary_offline_wp">Spara kartor för extra punkter för användning offline</string>
     <string name="init_save_log_img">Loggbilder</string>
     <string name="init_summary_save_log_img">Spara bilder från loggar</string>
     <string name="init_units">Enheter</string>
@@ -686,8 +687,7 @@
     <!-- map sources -->
     <string name="map_source_google_map">Google: Map</string>
     <string name="map_source_google_satellite">Google: Satellit</string>
-    <string name="map_source_osm_mapnik">OSM: Mapnik</string>
-    <string name="map_source_osm_cyclemap">OSM: Cyclemap</string>
+    <string name="map_source_osm_mapnik">OSM: Map</string>
     <string name="map_source_osm_offline">Offline</string>
     <string name="init_sendToCgeo">Skicka till c:geo (Send2cgeo)</string>
     <string name="settings_info_send2cgeo_title">Info om send2cgeo</string>
@@ -732,6 +732,8 @@
     <string name="auth_ocro">opencaching.ro</string>
     <string name="auth_ocuk">opencache.uk</string>
     <string name="auth_dialog_completed_oc">c:geo är nu godkänd för att kommunicera med %s.</string>
+    <!-- auth geocaching.su -->
+    <string name="auth_su">geocaching.su</string>
     <!-- auth geokrety -->
     <string name="auth_dialog_completed_geokrety">c:geo är nu godkänd för att kommunicera med %s.</string>
     <string name="err_auth_geokrety_bad_password">Ditt användarnamn/lösenord verkar felaktigt.</string>
@@ -795,6 +797,11 @@
     <string name="cache_description">Beskrivning</string>
     <string name="cache_description_long">Lång beskrivning</string>
     <string name="cache_description_table_note">Beskrivningen innehåller tabellformatering som eventuellt behöver läsas på %s för att se korrekt ut.</string>
+    <string name="cache_area_description">Area Description</string>
+    <string name="cache_cache_description">Cache Description</string>
+    <string name="cache_virtual_description">Virtual Question</string>
+    <string name="cache_traditional_description">Traditional Part</string>
+    <string name="cache_box_description">Box Content</string>
     <string name="cache_watchlist_on">Den här cachen finns i din watchlist.</string>
     <string name="cache_watchlist_on_extra">Denna cache är på din bevakningslista. (Bevakare: %1d)</string>
     <string name="cache_watchlist_not_on">Den här cachen finns inte i din watchlist.</string>
@@ -856,8 +863,6 @@
     <string name="cache_menu_radar">Radar</string>
     <string name="cache_menu_map">Visa på karta</string>
     <string name="cache_menu_mfbeta">Mapsforge Beta</string>
-    <string name="cache_menu_map_static">Sparade kartor</string>
-    <string name="cache_menu_download_map_static">Spara kartor</string>
     <string name="cache_menu_rmaps">Rmaps</string>
     <string name="cache_menu_map_ext">Andra externa program</string>
     <string name="cache_menu_streetview">Gatuvy</string>
@@ -946,7 +951,6 @@
     <string name="gpx_import_loading_caches_with_filename">Laddar cacher från %1$s</string>
     <string name="gpx_import_loading_waypoints">Läser in punkter från .gpx file</string>
     <string name="gpx_import_loading_waypoints_with_filename">Laddar waypoints från %1$s</string>
-    <string name="gpx_import_store_static_maps">Sparar kartor</string>
     <string name="gpx_import_caches_imported">cacher importerade</string>
     <string name="gpx_import_caches_imported_with_filename">%1$d cacher importerade från %2$s</string>
     <string name="gpx_import_static_maps_skipped">Hämtningen av kartor avbröts</string>
@@ -1036,7 +1040,7 @@
     <string name="map_disabled_hide">Göm inaktiverade cacher</string>
     <string name="map_theme_builtin">Standard</string>
     <string name="map_theme_select">Välj karttema</string>
-    <string name="map_theme_options">Theme Options</string>
+    <string name="map_theme_options">Inställningar för teman</string>
     <string name="map_live_enable">Aktivera live</string>
     <string name="map_live_disable">Inaktivera live</string>
     <string name="map_static_title">Sparade kartor</string>
@@ -1562,4 +1566,9 @@
     <string name="err_logimage_caption_required">En text krävs till bilden</string>
     <string name="waypoint_latitude_null">N/S --° --.---</string>
     <string name="waypoint_longitude_null">E/W --° --.---</string>
+    <!-- permission handling -->
+    <string name="close_app">Close app</string>
+    <string name="ask_again">Ask me again</string>
+    <string name="location_permission_request_explanation">c:geo needs access to the GPS on your device to locate your position and calculate distance and direction to geocaches. It cannot be used without this permission.</string>
+    <string name="storage_permission_request_explanation">c:geo will write data onto your phone storage or SD card as soon as you save geocaches for offline use. Furthermore c:geo will use your phone storage for import and export of files and reading of offline maps. It cannot be used without this permission.</string>
 </resources>

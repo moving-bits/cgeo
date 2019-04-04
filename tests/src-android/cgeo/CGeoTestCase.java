@@ -1,22 +1,16 @@
 package cgeo;
 
 import cgeo.geocaching.CgeoApplication;
-import cgeo.geocaching.storage.DataStore;
-import cgeo.geocaching.models.Geocache;
 import cgeo.geocaching.enumerations.LoadFlags;
 import cgeo.geocaching.enumerations.LoadFlags.RemoveFlag;
-import cgeo.geocaching.settings.Settings;
-import cgeo.geocaching.settings.TestSettings;
+import cgeo.geocaching.models.Geocache;
+import cgeo.geocaching.storage.DataStore;
 
 import android.test.ApplicationTestCase;
 
 import java.util.EnumSet;
 
 public abstract class CGeoTestCase extends ApplicationTestCase<CgeoApplication> {
-
-    private boolean oldStoreMapsFlag;
-    private boolean oldStoreWpMapsFlag;
-    private boolean oldMapStoreFlagsRecorded = false;
 
     public CGeoTestCase() {
         super(CgeoApplication.class);
@@ -53,42 +47,4 @@ public abstract class CGeoTestCase extends ApplicationTestCase<CgeoApplication> 
         DataStore.saveCache(cache, LoadFlags.SAVE_ALL);
     }
 
-    /**
-     * must be called once before setting the flags
-     * can be called again after restoring the flags
-     */
-    protected void recordMapStoreFlags() {
-        if (oldMapStoreFlagsRecorded) {
-            throw new IllegalStateException("MapStoreFlags already recorded!");
-        }
-        oldStoreMapsFlag = Settings.isStoreOfflineMaps();
-        oldStoreWpMapsFlag = Settings.isStoreOfflineWpMaps();
-        oldMapStoreFlagsRecorded = true;
-    }
-
-    /**
-     * can be called after recordMapStoreFlags,
-     * to set the flags for map storing as necessary
-     */
-    protected void setMapStoreFlags(final boolean storeCacheMap, final boolean storeWpMaps) {
-        if (!oldMapStoreFlagsRecorded) {
-            throw new IllegalStateException("Previous MapStoreFlags havn't been recorded! Setting not allowed");
-        }
-
-        TestSettings.setStoreOfflineMaps(storeCacheMap);
-        TestSettings.setStoreOfflineWpMaps(storeWpMaps);
-    }
-
-    /**
-     * has to be called after completion of the test (preferably in the finally part of a try statement)
-     */
-    protected void restoreMapStoreFlags() {
-        if (!oldMapStoreFlagsRecorded) {
-            throw new IllegalStateException("Previous MapStoreFlags havn't been recorded. Restore not possible");
-        }
-
-        TestSettings.setStoreOfflineMaps(oldStoreMapsFlag);
-        TestSettings.setStoreOfflineWpMaps(oldStoreWpMapsFlag);
-        oldMapStoreFlagsRecorded = false;
-    }
 }

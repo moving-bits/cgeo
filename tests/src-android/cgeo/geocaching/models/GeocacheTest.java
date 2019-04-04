@@ -1,13 +1,6 @@
 package cgeo.geocaching.models;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import cgeo.CGeoTestCase;
 import cgeo.geocaching.CgeoApplication;
@@ -19,7 +12,14 @@ import cgeo.geocaching.list.StoredList;
 import cgeo.geocaching.location.Geopoint;
 import cgeo.geocaching.log.LogType;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
 
 public class GeocacheTest extends CGeoTestCase {
 
@@ -45,17 +45,16 @@ public class GeocacheTest extends CGeoTestCase {
         final Geocache two = new Geocache();
 
         // identity
-        //noinspection EqualsWithItself
-        assertThat(one.equals(one)).isTrue();
+        assertThat(one).isEqualTo(one);
 
         // different objects without geocode shall not be equal
-        assertThat(one.equals(two)).isFalse();
+        assertThat(one).isNotEqualTo(two);
 
         one.setGeocode("geocode");
         two.setGeocode("geocode");
 
         // different objects with same geocode shall be equal
-        assertThat(one.equals(two)).isTrue();
+        assertThat(one).isEqualTo(two);
     }
 
     public static void testGeocodeUppercase() {
@@ -81,30 +80,22 @@ public class GeocacheTest extends CGeoTestCase {
     }
 
     private void assertWaypointsParsed(final String note, final int expectedWaypoints) {
-        recordMapStoreFlags();
-
-        try {
-            setMapStoreFlags(false, false);
-
-            final Geocache cache = new Geocache();
-            final String geocode = "Test" + System.nanoTime();
-            cache.setGeocode(geocode);
-            cache.setWaypoints(new ArrayList<Waypoint>(), false);
-            for (int i = 0; i < 2; i++) {
-                cache.setPersonalNote(note);
-                cache.addWaypointsFromNote();
-                final List<Waypoint> waypoints = cache.getWaypoints();
-                assertThat(waypoints).isNotNull();
-                assertThat(waypoints).hasSize(expectedWaypoints);
-                final Waypoint waypoint = waypoints.get(0);
-                assertThat(waypoint.getCoords()).isEqualTo(new Geopoint("N51 13.888 E007 03.444"));
-                assertThat(waypoint.getName()).isEqualTo(CgeoApplication.getInstance().getString(R.string.cache_personal_note) + " 1");
-                cache.store(Collections.singleton(StoredList.TEMPORARY_LIST.id), null);
-            }
-            removeCacheCompletely(geocode);
-        } finally {
-            restoreMapStoreFlags();
+        final Geocache cache = new Geocache();
+        final String geocode = "Test" + System.nanoTime();
+        cache.setGeocode(geocode);
+        cache.setWaypoints(new ArrayList<Waypoint>(), false);
+        for (int i = 0; i < 2; i++) {
+            cache.setPersonalNote(note);
+            cache.addWaypointsFromNote();
+            final List<Waypoint> waypoints = cache.getWaypoints();
+            assertThat(waypoints).isNotNull();
+            assertThat(waypoints).hasSize(expectedWaypoints);
+            final Waypoint waypoint = waypoints.get(0);
+            assertThat(waypoint.getCoords()).isEqualTo(new Geopoint("N51 13.888 E007 03.444"));
+            assertThat(waypoint.getName()).isEqualTo(CgeoApplication.getInstance().getString(R.string.cache_personal_note) + " 1");
+            cache.store(Collections.singleton(StoredList.TEMPORARY_LIST.id), null);
         }
+        removeCacheCompletely(geocode);
     }
 
     public static void testMergeDownloaded() {

@@ -158,6 +158,7 @@
     <string name="err_parse">Kļūda autorizācijas lapas apstrādē</string>
     <string name="err_server">Nevar sazināties ar Geocaching.com. Vietne šobrīd var nedarboties vai arī tavs interneta savienojums nedarbojas.</string>
     <string name="err_server_ec">Nevar sazināties ar Extremcaching.com. Vietne šobrīd var nedarboties vai arī tavs interneta savienojums nedarbojas.</string>
+    <string name="err_server_su">Unable to contact Geocaching.su. The website may be down or your internet connection not working.</string>
     <string name="err_server_gk">Nevar sazināties ar GeoKrety.org. Vietne var būt uz laiku nepieejama vai arī tavs interneta savienojums nedarbojas.</string>
     <string name="err_login">Nav saglabāta pieteikšanās informācija</string>
     <string name="err_login_failed_toast">c:geo nevar pierakstīties. c:geo darbojas bezsaistē ar saglabātajiem slēpņiem. Pārbaudi ielogošanās iestatījumus vai aktivizē/iespējo interneta savienojumu.</string>
@@ -196,6 +197,7 @@
     <string name="err_favorite_failed">Favorīta statusa maiņa neizdevās.</string>
     <string name="err_select_logimage_failed">Attēlu atlasīšana priekš pierakstīšanās neizdevās.</string>
     <string name="err_acquire_image_failed">Attēla iegūšana neizdevās.</string>
+    <string name="err_unsupported_image_format">Unsupported image format.</string>
     <string name="err_tb_display">c:geo nevar parādīt ceļotājus, kurus izvēlējāties. Vai tie patiešām ir ceļotāji?</string>
     <string name="err_tb_details_open">c:geo nevar atvērt ceļotāja datus.</string>
     <string name="err_tb_not_loggable">Šis ceļotājs nav reģistrējams.</string>
@@ -258,7 +260,6 @@
     <string name="info_log_report_problem_changed">Pieejamie paziņojamo problēmu veidi ir mainījušies!</string>
     <string name="info_select_logimage_cancelled">Attēla atlase vai uzņemšana tika atcelta.</string>
     <string name="info_stored_image">Jauns attēls tika saglabāts:</string>
-    <string name="info_storing_static_maps">Cenšas saglabāt statiskās kartes</string>
     <string name="info_cache_saved">Slēpnis ir saglabāts tavā ierīcē bezsaistē</string>
     <string name="warn_calculator_state_save">Ja vēlies saglabāt kalkulatora stāvokli, noteikti saglabā starpposmu.</string>
     <string name="err_trackable_log_not_anonymous">Nevar pieteikties %1$s no c:geo anonīmi. Vai vēlies atvērt uzstādījumus, lai ievadītu akreditācijas datus no %2$s?</string>
@@ -428,6 +429,7 @@
     <string name="about_system_info">Par c:geo</string>
     <string name="about_system_info_send_chooser">Nosūtīt sistēmas informāciju</string>
     <string name="changelog_github">Visu izmaiņu saraksts</string>
+    <string name="about_nutshellmanual">Online manual</string>
     <!-- settings -->
     <string name="settings_title_open_settings">Atvērt uzstādījumus?</string>
     <string name="settings_title_services">Servisi</string>
@@ -437,7 +439,7 @@
     <string name="settings_title_cachedetails">Slēpņu informācija</string>
     <string name="settings_summary_cachedetails">Pielāgot displeju slēpņa informācijai.</string>
     <string name="settings_title_offlinedata">Bezsaistes dati</string>
-    <string name="settings_summary_offlinedata">Konfigurēt statiskās kartes un citas bezsaistes datu krātuves.</string>
+    <string name="settings_summary_offlinedata">Configure other offline data storage.</string>
     <string name="settings_title_logging">Pierakstīšanās</string>
     <string name="settings_summary_logging">Konfigurē savu parakstu un iestati reģistrācijas ieraksta opcijas.</string>
     <string name="settings_title_map">Karte</string>
@@ -465,6 +467,7 @@
     <string name="settings_goto_url_button">vairāk…</string>
     <string name="settings_title_gc">Geocaching.com</string>
     <string name="settings_title_ec">Extremcaching.com</string>
+    <string name="settings_title_su">Geocaching.su</string>
     <string name="settings_title_ox">Opencaching.com (Garmin)</string>
     <string name="settings_activate_gc">Aktivizēt</string>
     <string name="settings_activate_ec">Aktivizēt</string>
@@ -558,12 +561,10 @@
     <string name="init_summary_exclude">Nerādīt tev piederošus vai jau atrastos slēpņus</string>
     <string name="init_showwaypoints">Rādīt starpposmus</string>
     <string name="init_showwaypoint_description">Ja skaits ir mazāks nekā norādītais attēlojamo slēpņu skaits, tad papildus kartē tiek parādīti arī to Starpposmi.</string>
+    <string name="init_brouterThreshold">Calculate route</string>
+    <string name="init_brouterThreshold_description">Maximum distance up to which brouter helper app (if installed) will calculate a route.</string>
     <string name="init_disabled">Izlaist atspējotos</string>
     <string name="init_summary_disabled">Izlaist atspējotos slēpņus</string>
-    <string name="init_offline">Statiska karte</string>
-    <string name="init_summary_offline">Uzglabāt statiskas slēpņu kartes bezsaistes lietošanai</string>
-    <string name="init_offline_wp">Statiskas kartes (SP)</string>
-    <string name="init_summary_offline_wp">Saglabāt starpposmu statiskās kartes lietošanai bezsaistē</string>
     <string name="init_save_log_img">Saglabāt attēlus</string>
     <string name="init_summary_save_log_img">Saglabāt attēlus no ierakstiem</string>
     <string name="init_units">Izmantot imperiālo sistēmu</string>
@@ -689,8 +690,7 @@
     <!-- map sources -->
     <string name="map_source_google_map">Google: Map</string>
     <string name="map_source_google_satellite">Google: Satellite</string>
-    <string name="map_source_osm_mapnik">OSM: Mapnik</string>
-    <string name="map_source_osm_cyclemap">OSM: Cyclemap</string>
+    <string name="map_source_osm_mapnik">OSM: Map</string>
     <string name="map_source_osm_offline">Bezsaistes režīmā</string>
     <string name="init_sendToCgeo">Send to c:geo</string>
     <string name="settings_info_send2cgeo_title">Info par send2cgeo</string>
@@ -735,6 +735,8 @@
     <string name="auth_ocro">opencaching.ro</string>
     <string name="auth_ocuk">opencache.uk</string>
     <string name="auth_dialog_completed_oc">c:geo tagad ir atļauja sazināties ar %s.</string>
+    <!-- auth geocaching.su -->
+    <string name="auth_su">geocaching.su</string>
     <!-- auth geokrety -->
     <string name="auth_dialog_completed_geokrety">c:geo tagad ir atļauja sazināties ar %s.</string>
     <string name="err_auth_geokrety_bad_password">Tavs lietotājvārds/parole, šķiet nederīgs.</string>
@@ -804,6 +806,11 @@
     <string name="cache_description">Apraksts</string>
     <string name="cache_description_long">Garš apraksts</string>
     <string name="cache_description_table_note">Apraksts satur tabulas formatējumu, kuru, iespējams, vajadzēs apskatīt %s, lai redzētu pareizi.</string>
+    <string name="cache_area_description">Area Description</string>
+    <string name="cache_cache_description">Cache Description</string>
+    <string name="cache_virtual_description">Virtual Question</string>
+    <string name="cache_traditional_description">Traditional Part</string>
+    <string name="cache_box_description">Box Content</string>
     <string name="cache_watchlist_on">Tu novēro šo slēpni.</string>
     <string name="cache_watchlist_on_extra">Šis slēpnis atrodas tavā sarakstā ar novērojamajiem (Novērotāji: %1d).</string>
     <string name="cache_watchlist_not_on">Šis slēpnis nav tavā sarakstā ar novērojamajiem slēpņiem.</string>
@@ -866,8 +873,6 @@
     <string name="cache_menu_radar">Radars</string>
     <string name="cache_menu_map">Karte</string>
     <string name="cache_menu_mfbeta">Mapsforge Beta</string>
-    <string name="cache_menu_map_static">Statiskās kartes</string>
-    <string name="cache_menu_download_map_static">Lejupielādēt statisko karti</string>
     <string name="cache_menu_rmaps">Rmaps</string>
     <string name="cache_menu_map_ext">Citas ārējās aplikācijas</string>
     <string name="cache_menu_streetview">Ielas skats (Street View)</string>
@@ -956,7 +961,6 @@
     <string name="gpx_import_loading_caches_with_filename">Ielādē slēpņus no %1$s</string>
     <string name="gpx_import_loading_waypoints">Ielādē starpposmu failu</string>
     <string name="gpx_import_loading_waypoints_with_filename">Ielādē starpposmus no %1$s</string>
-    <string name="gpx_import_store_static_maps">Notiek statisko karšu lejupielādēšana</string>
     <string name="gpx_import_caches_imported">slēpņi importēti</string>
     <string name="gpx_import_caches_imported_with_filename">importēti %1$d slēpņi no %2$s</string>
     <string name="gpx_import_static_maps_skipped">Statisko karšu lejupielāde tika pārtraukta</string>
@@ -1584,4 +1588,9 @@
     <string name="err_logimage_caption_required">Attēlam ir nepieciešams pievienot parakstu</string>
     <string name="waypoint_latitude_null">N/S --° --.---</string>
     <string name="waypoint_longitude_null">E/W --° --.---</string>
+    <!-- permission handling -->
+    <string name="close_app">Close app</string>
+    <string name="ask_again">Ask me again</string>
+    <string name="location_permission_request_explanation">c:geo needs access to the GPS on your device to locate your position and calculate distance and direction to geocaches. It cannot be used without this permission.</string>
+    <string name="storage_permission_request_explanation">c:geo will write data onto your phone storage or SD card as soon as you save geocaches for offline use. Furthermore c:geo will use your phone storage for import and export of files and reading of offline maps. It cannot be used without this permission.</string>
 </resources>

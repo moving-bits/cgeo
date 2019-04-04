@@ -31,6 +31,9 @@ import cgeo.geocaching.maps.routing.RoutingMode;
 import cgeo.geocaching.models.Geocache;
 import cgeo.geocaching.models.Waypoint;
 import cgeo.geocaching.network.AndroidBeam;
+import cgeo.geocaching.permission.PermissionHandler;
+import cgeo.geocaching.permission.PermissionRequestContext;
+import cgeo.geocaching.permission.RestartLocationPermissionGrantedCallback;
 import cgeo.geocaching.sensors.GeoData;
 import cgeo.geocaching.sensors.GeoDirHandler;
 import cgeo.geocaching.sensors.Sensors;
@@ -89,7 +92,6 @@ import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -526,7 +528,16 @@ public class CGeoMap extends AbstractMap implements ViewFactory {
     @Override
     public void onResume() {
         super.onResume();
-        resumeDisposables.addAll(geoDirUpdate.start(GeoDirHandler.UPDATE_GEODIR), startTimer());
+
+        // resume location access
+        PermissionHandler.executeIfLocationPermissionGranted(this.activity,
+                new RestartLocationPermissionGrantedCallback(PermissionRequestContext.CGeoMap) {
+
+                    @Override
+                    public void executeAfter() {
+                        resumeDisposables.addAll(geoDirUpdate.start(GeoDirHandler.UPDATE_GEODIR), startTimer());
+                    }
+                });
 
         final List<String> toRefresh;
         synchronized (dirtyCaches) {
@@ -1348,7 +1359,7 @@ public class CGeoMap extends AbstractMap implements ViewFactory {
             }
         }
 
-        protected abstract void runWithMap(final CGeoMap map);
+        protected abstract void runWithMap(CGeoMap map);
     }
 
     /**

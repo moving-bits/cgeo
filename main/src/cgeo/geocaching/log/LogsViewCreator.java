@@ -21,7 +21,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 public abstract class LogsViewCreator extends AbstractCachingListViewPageViewCreator {
 
@@ -124,7 +124,7 @@ public abstract class LogsViewCreator extends AbstractCachingListViewPageViewCre
 
     protected abstract void addHeaderView();
 
-    protected abstract void fillCountOrLocation(LogViewHolder holder, final LogEntry log);
+    protected abstract void fillCountOrLocation(LogViewHolder holder, LogEntry log);
 
     protected abstract boolean isValid();
 

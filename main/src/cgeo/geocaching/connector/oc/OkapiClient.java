@@ -6,10 +6,11 @@ import cgeo.geocaching.connector.ConnectorFactory;
 import cgeo.geocaching.connector.IConnector;
 import cgeo.geocaching.connector.ImageResult;
 import cgeo.geocaching.connector.LogResult;
+import cgeo.geocaching.connector.UserInfo;
+import cgeo.geocaching.connector.UserInfo.UserInfoStatus;
 import cgeo.geocaching.connector.gc.GCConnector;
 import cgeo.geocaching.connector.oc.OCApiConnector.ApiSupport;
 import cgeo.geocaching.connector.oc.OCApiConnector.OAuthLevel;
-import cgeo.geocaching.connector.oc.UserInfo.UserInfoStatus;
 import cgeo.geocaching.connector.trackable.TrackableBrand;
 import cgeo.geocaching.enumerations.CacheAttribute;
 import cgeo.geocaching.enumerations.CacheSize;
@@ -59,7 +60,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
-
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -354,13 +354,15 @@ final class OkapiClient {
 
     @NonNull
     public static ImageResult postLogImage(final String logId, final Image image, @NonNull final OCApiConnector connector) {
+        final Parameters params = new Parameters("log_uuid", logId);
+        final File file = image.getFile();
+        if (file == null) {
+            return new ImageResult(StatusCode.LOGIMAGE_POST_ERROR, "");
+        }
+        FileInputStream fileStream = null;
         try {
-            final Parameters params = new Parameters("log_uuid", logId);
-            final File file = image.getFile();
-            if (file == null) {
-                return new ImageResult(StatusCode.LOGIMAGE_POST_ERROR, "");
-            }
-            params.add("image", Base64.encodeToString(IOUtils.readFully(new FileInputStream(file), (int) file.length()), DEFAULT));
+            fileStream = new FileInputStream(file);
+            params.add("image", Base64.encodeToString(IOUtils.readFully(fileStream, (int) file.length()), DEFAULT));
             params.add("caption", createImageCaption(image));
 
             final ObjectNode data = postRequest(connector, OkapiService.SERVICE_ADD_LOG_IMAGE, params).data;
@@ -376,6 +378,8 @@ final class OkapiClient {
             return new ImageResult(StatusCode.LOGIMAGE_POST_ERROR, "");
         } catch (final Exception e) {
             Log.e("OkapiClient.postLogImage", e);
+        } finally {
+            IOUtils.closeQuietly(fileStream);
         }
         return new ImageResult(StatusCode.LOGIMAGE_POST_ERROR, "");
     }

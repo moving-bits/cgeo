@@ -14,6 +14,9 @@ import cgeo.geocaching.location.Geopoint;
 import cgeo.geocaching.location.Units;
 import cgeo.geocaching.maps.DefaultMap;
 import cgeo.geocaching.network.Network;
+import cgeo.geocaching.permission.PermissionGrantedCallback;
+import cgeo.geocaching.permission.PermissionHandler;
+import cgeo.geocaching.permission.PermissionRequestContext;
 import cgeo.geocaching.playservices.AppInvite;
 import cgeo.geocaching.sensors.GeoData;
 import cgeo.geocaching.sensors.GeoDirHandler;
@@ -34,6 +37,7 @@ import cgeo.geocaching.utils.TextUtils;
 import cgeo.geocaching.utils.Version;
 import cgeo.geocaching.utils.functions.Action1;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
@@ -41,13 +45,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Address;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.support.v7.widget.SearchView.OnSuggestionListener;
@@ -70,6 +77,7 @@ import com.google.zxing.integration.android.IntentResult;
 import com.jakewharton.processphoenix.ProcessPhoenix;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import org.apache.commons.lang3.StringUtils;
@@ -101,6 +109,10 @@ public class MainActivity extends AbstractActionBarActivity {
     private final UpdateLocation locationUpdater = new UpdateLocation();
     private final Handler updateUserInfoHandler = new UpdateUserInfoHandler(this);
     private final Handler firstLoginHandler = new FirstLoginHandler(this);
+    /**
+     * initialization with an empty subscription
+     */
+    private final CompositeDisposable resumeDisposables = new CompositeDisposable();
 
     private static final class UpdateUserInfoHandler extends WeakReferenceHandler<MainActivity> {
 
@@ -227,7 +239,15 @@ public class MainActivity extends AbstractActionBarActivity {
         super.onCreate(savedInstanceState);
 
         // Disable the up navigation for this activity
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(false);
+
+            // show c:geo logo
+            actionBar.setLogo(R.drawable.actionbar_cgeo);
+            actionBar.setDisplayUseLogoEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
 
         setContentView(R.layout.main_activity);
         ButterKnife.bind(this);
@@ -242,6 +262,26 @@ public class MainActivity extends AbstractActionBarActivity {
 
         Log.i("Starting " + getPackageName() + ' ' + Version.getVersionCode(this) + " a.k.a " + Version.getVersionName(this));
 
+        final Activity mainActivity = this;
+
+        PermissionHandler.requestStoragePermission(this, new PermissionGrantedCallback(PermissionRequestContext.MainActivityStorage) {
+            @Override
+            protected void execute() {
+                PermissionHandler.executeIfLocationPermissionGranted(mainActivity, new PermissionGrantedCallback(PermissionRequestContext.MainActivityOnCreate) {
+                    // TODO: go directly into execute if the device api level is below 26
+                    @Override
+                    public void execute() {
+                        final Sensors sensors = Sensors.getInstance();
+                        sensors.setupGeoDataObservables(Settings.useGooglePlayServices(), Settings.useLowPowerMode());
+                        sensors.setupDirectionObservable();
+
+                        // Attempt to acquire an initial location before any real activity happens.
+                        sensors.geoDataObservable(true).subscribeOn(AndroidRxUtils.looperCallbacksScheduler).take(1).subscribe();
+                    }
+                });
+            }
+        });
+
         init();
 
         checkShowChangelog();
@@ -252,6 +292,35 @@ public class MainActivity extends AbstractActionBarActivity {
         }
 
         confirmDebug();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            PermissionHandler.executeCallbacksFor(permissions);
+        } else {
+            final Activity activity = this;
+            final PermissionRequestContext perm = PermissionRequestContext.fromRequestCode(requestCode);
+            new AlertDialog.Builder(this)
+                    .setMessage(perm.getAskAgainResource())
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.ask_again, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialog, final int which) {
+                            PermissionHandler.askAgainFor(permissions, activity, perm);
+                        }
+                    })
+                    .setNegativeButton(R.string.close_app, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialog, final int which) {
+                            activity.finish();
+                            System.exit(0);
+                        }
+                    })
+                    .setIcon(R.drawable.ic_menu_preferences)
+                    .create()
+                    .show();
+        }
     }
 
     @SuppressWarnings("unused") // in Eclipse, BuildConfig.DEBUG is always true
@@ -275,12 +344,26 @@ public class MainActivity extends AbstractActionBarActivity {
 
     @Override
     public void onResume() {
-        super.onResume(locationUpdater.start(GeoDirHandler.UPDATE_GEODATA | GeoDirHandler.LOW_POWER),
-                Sensors.getInstance().gpsStatusObservable().observeOn(AndroidSchedulers.mainThread()).subscribe(satellitesHandler));
+        super.onResume();
+        final Activity mainActivity = this;
+        PermissionHandler.requestStoragePermission(this, new PermissionGrantedCallback(PermissionRequestContext.MainActivityStorage) {
+            @Override
+            protected void execute() {
+                PermissionHandler.executeIfLocationPermissionGranted(mainActivity, new PermissionGrantedCallback(PermissionRequestContext.MainActivityOnResume) {
+
+                    @Override
+                    public void execute() {
+                        resumeDisposables.add(locationUpdater.start(GeoDirHandler.UPDATE_GEODATA | GeoDirHandler.LOW_POWER));
+                        resumeDisposables.add(Sensors.getInstance().gpsStatusObservable().observeOn(AndroidSchedulers.mainThread()).subscribe(satellitesHandler));
+
+                    }
+                });
+            }
+        });
+
         updateUserInfoHandler.sendEmptyMessage(-1);
         startBackgroundLogin();
         init();
-
         connectivityChangeReceiver = new ConnectivityChangeReceiver();
         registerReceiver(connectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
@@ -308,7 +391,6 @@ public class MainActivity extends AbstractActionBarActivity {
     @Override
     public void onDestroy() {
         initialized = false;
-        ConnectorFactory.showLoginToast = true;
 
         super.onDestroy();
     }
@@ -322,6 +404,7 @@ public class MainActivity extends AbstractActionBarActivity {
     @Override
     public void onPause() {
         initialized = false;
+        resumeDisposables.clear();
         unregisterReceiver(connectivityChangeReceiver);
         super.onPause();
     }

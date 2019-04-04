@@ -4,6 +4,7 @@ import cgeo.geocaching.CgeoApplication;
 import cgeo.geocaching.Intents;
 import cgeo.geocaching.R;
 import cgeo.geocaching.compatibility.Compatibility;
+import cgeo.geocaching.enumerations.CacheListType;
 import cgeo.geocaching.enumerations.CacheType;
 import cgeo.geocaching.enumerations.LoadFlags;
 import cgeo.geocaching.models.Geocache;
@@ -13,6 +14,7 @@ import cgeo.geocaching.utils.ClipboardUtils;
 import cgeo.geocaching.utils.EditUtils;
 import cgeo.geocaching.utils.HtmlUtils;
 import cgeo.geocaching.utils.Log;
+import cgeo.geocaching.utils.MapUtils;
 import cgeo.geocaching.utils.TextUtils;
 import cgeo.geocaching.utils.TranslationUtils;
 
@@ -23,6 +25,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.view.Menu;
@@ -78,8 +81,7 @@ public abstract class AbstractActivity extends ActionBarActivity implements IAbs
         return super.onOptionsItemSelected(item);
     }
 
-    public void onResume(final Disposable... resumeDisposable) {
-        super.onResume();
+    protected void resumeDisposables(final Disposable... resumeDisposable) {
         this.resumeDisposable.addAll(resumeDisposable);
     }
 
@@ -230,10 +232,14 @@ public abstract class AbstractActivity extends ActionBarActivity implements IAbs
 
     private void setCacheTitleBar(@NonNull final CharSequence title, @Nullable final CacheType type) {
         setTitle(title);
-        if (type != null) {
-            getSupportActionBar().setIcon(Compatibility.getDrawable(getResources(), type.markerId));
-        } else {
-            getSupportActionBar().setIcon(android.R.color.transparent);
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            if (type != null) {
+                actionBar.setDisplayShowHomeEnabled(true);
+                actionBar.setIcon(Compatibility.getDrawable(getResources(), type.markerId));
+            } else {
+                actionBar.setIcon(android.R.color.transparent);
+            }
         }
     }
 
@@ -241,7 +247,12 @@ public abstract class AbstractActivity extends ActionBarActivity implements IAbs
      * change the titlebar icon and text to show the current geocache
      */
     protected void setCacheTitleBar(@NonNull final Geocache cache) {
-        setCacheTitleBar(TextUtils.coloredCacheText(cache, cache.getName() + " (" + cache.getGeocode() + ")"), cache.getType());
+        setTitle(TextUtils.coloredCacheText(cache, cache.getName() + " (" + cache.getGeocode() + ")"));
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setIcon(MapUtils.getCacheMarker(getResources(), cache, CacheListType.OFFLINE));
+        }
     }
 
     /**
