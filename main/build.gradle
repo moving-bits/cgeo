@@ -365,6 +365,9 @@ dependencies {
 
     // Zxing barcode reader integration
     implementation 'com.google.zxing:android-integration:3.3.0'
+
+    // too large tool - for debugging purposes only
+    implementation 'com.gu.android:toolargetool:0.2.1@aar'
 }
 
 /*

@@ -130,6 +130,8 @@ subprojects {
         }
         // Android Support libraries are now in an online Maven repository
         google()
+        // toolargetool
+        maven { url 'https://dl.bintray.com/guardian/android' }
     }
 
     // disable warning of annotation processor about annotation types with no registered processor (like @NonNull)

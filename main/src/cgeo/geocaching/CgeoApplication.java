@@ -18,6 +18,8 @@ import android.view.ViewConfiguration;
 
 import androidx.annotation.NonNull;
 
+import com.gu.toolargetool.TooLargeTool;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -56,6 +58,9 @@ public class CgeoApplication extends Application {
 
         // Restore cookies
         Cookies.restoreCookies();
+
+        // for debugging purposes only
+        TooLargeTool.startLogging(this);
     }
 
     /**
