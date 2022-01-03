@@ -11,6 +11,7 @@ import cgeo.geocaching.models.Route;
 import cgeo.geocaching.settings.Settings;
 import cgeo.geocaching.storage.ContentStorageActivityHelper;
 import cgeo.geocaching.storage.PersistableFolder;
+import cgeo.geocaching.ui.dialog.Dialogs;
 import cgeo.geocaching.ui.dialog.SimpleDialog;
 import cgeo.geocaching.utils.functions.Action2;
 
@@ -20,6 +21,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.widget.PopupMenu;
 
@@ -52,6 +55,19 @@ public class IndividualRouteUtils {
      *
      */
     public void showPopup(final View anchor, final IndividualRoute individualRoute, final boolean isTargetSet, final Route.CenterOnPosition centerOnPosition, final Action2<Geopoint, String> setTarget) {
+        final View v = activity.getLayoutInflater().inflate(R.layout.routes_tracks_dialog, null);
+        v.findViewById(R.id.item_sort).setVisibility(View.VISIBLE);
+
+        ((TextView) v.findViewById(R.id.track1).findViewById(R.id.item_title)).setText("Rheinsteig Tag 1");
+        ((TextView) v.findViewById(R.id.track2).findViewById(R.id.item_title)).setText("Rheinsteig Tag 2");
+        ((ImageButton) v.findViewById(R.id.track2).findViewById(R.id.item_visibility)).setImageResource(R.drawable.visibility_off);
+
+
+        Dialogs.bottomSheetDialogWithActionbar(activity, v, R.string.routes_tracks_dialog_title).show();
+
+
+        /*
+
         final PopupMenu p = new PopupMenu(anchor.getContext(), anchor);
         final Menu menu = p.getMenu();
         p.getMenuInflater().inflate(R.menu.individual_route, menu);
@@ -68,6 +84,7 @@ public class IndividualRouteUtils {
 
         p.setOnMenuItemClickListener(item -> onOptionsItemSelected(item.getItemId(), individualRoute, centerOnPosition, setTarget));
         p.show();
+        */
     }
 
     private boolean isVisible(final IndividualRoute route) {

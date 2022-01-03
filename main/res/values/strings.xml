@@ -2208,6 +2208,7 @@
     <string name="notification_download_receiver_title">Importing download</string>
 
     <!-- individual routes -->
+    <string name="routes_tracks_dialog_title">Routes / tracks options</string>
     <string name="individual_route">Individual route</string>
     <string name="individual_route_added">added to route</string>
     <string name="individual_route_removed">removed from route</string>
