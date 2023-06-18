@@ -697,7 +697,6 @@ public final class MapMarkerUtils {
         }
     }
 
-    @SuppressWarnings("DiscouragedApi")
     private static LayerDrawable createDTRatingMarker(final Resources res, final float difficulty, final float terrain) {
         final Drawable background = DrawableCompat.wrap(ResourcesCompat.getDrawable(res, R.drawable.marker_rating_bg, null));
         final InsetsBuilder insetsBuilder = new InsetsBuilder(res, background.getIntrinsicWidth(), background.getIntrinsicHeight());
@@ -716,6 +715,7 @@ public final class MapMarkerUtils {
         return buildLayerDrawable(insetsBuilder, 4, 0);
     }
 
+    @SuppressWarnings("DiscouragedApi")
     private static Drawable getDTRatingMarkerSection(final Resources res, final String packageName, final String ratingLetter, final float rating) {
         // ensure that rating is an integer between 0 and 50 in steps of 5
         final int r = Math.max(0, Math.min(Math.round(rating * 2) * 5, 50));
