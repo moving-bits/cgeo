@@ -135,6 +135,7 @@
     <string translatable="false" name="preference_screen_geokrety">preference_screen_geokrety</string>
     <string translatable="false" name="pref_connectorGeokretyActive">connectorGeokretyActive</string>
     <string translatable="false" name="pref_fakekey_geokrety_authorization">fakekey_geokrety_authorization</string>
+    <string translatable="false" name="pref_geokrety_usecachelogs">geokrety_usecachelogs</string>
     <string translatable="false" name="pref_fakekey_geokrety_website">fakekey_geokrety_website</string>
     <string translatable="false" name="pref_fakekey_geokretymap_website">fakekey_geokretymap_website</string>
 

@@ -10,10 +10,12 @@ import cgeo.geocaching.connector.LogResult;
 import cgeo.geocaching.connector.StatusResult;
 import cgeo.geocaching.connector.capability.ILogin;
 import cgeo.geocaching.connector.capability.IVotingCapability;
+import cgeo.geocaching.connector.trackable.GeokretyConnector;
 import cgeo.geocaching.connector.trackable.TrackableConnector;
 import cgeo.geocaching.connector.trackable.TrackableLoggingManager;
 import cgeo.geocaching.enumerations.StatusCode;
 import cgeo.geocaching.models.Image;
+import cgeo.geocaching.settings.Settings;
 import cgeo.geocaching.storage.DataStore;
 import cgeo.geocaching.utils.AsyncTaskWithProgressText;
 import cgeo.geocaching.utils.ContextLogger;
@@ -220,9 +222,10 @@ public class LogCacheTask extends AsyncTaskWithProgressText<String, StatusResult
 
                 // Posting trackables logs
                 int trackableLogcounter = 1;
+                final boolean useCachelogs = !(connector instanceof GeokretyConnector) || Settings.getGeokretyUseCachelogs(); // see #6225
                 for (final TrackableLog trackableLog : trackablesMoved) {
                     publishProgress(res.getString(R.string.log_posting_generic_trackable, trackableLog.brand.getLabel(), trackableLogcounter, trackablesMoved.size()));
-                    manager.postLog(taskInterface.geocache, trackableLog, taskInterface.date.getCalendar(), log);
+                    manager.postLog(taskInterface.geocache, trackableLog, taskInterface.date.getCalendar(), useCachelogs ? log : "");
                     trackableLogcounter++;
                 }
             }

@@ -943,6 +943,10 @@ public class Settings {
         return getGeokretySecId() != null;
     }
 
+    public static boolean getGeokretyUseCachelogs() {
+        return getBoolean(R.string.pref_geokrety_usecachelogs, true);
+    }
+
     /**
      * Retrieve showed popup counter for warning about logging Trackable recommend Geocode
      *
