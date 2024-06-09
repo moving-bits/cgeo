@@ -194,6 +194,12 @@ public abstract class AbstractMapFragment extends Fragment {
             minHeight = activity.findViewById(R.id.actionBarSpacer).getHeight();
         }
 
+        final View filterbar = activity.findViewById(R.id.filter_bar);
+        if (filterbar != null) {
+            Log.e("heights: ab=" + minHeight + ", fb=" + filterbar.getHeight() + ", vis=" + filterbar.getVisibility());
+            minHeight += filterbar.getHeight();
+        }
+
         View v = activity.findViewById(R.id.distanceSupersize);
         if (v.getVisibility() != View.VISIBLE) {
             v = activity.findViewById(R.id.target);
