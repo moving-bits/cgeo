@@ -449,18 +449,18 @@ public class MapsforgeFragment extends AbstractMapFragment implements Observer {
 
     @Override
     public void selectTheme(final Activity activity) {
-        themeHelper.selectMapTheme(((AbstractMapsforgeTileProvider) currentTileProvider).getTileLayer(), tileCache);
+        themeHelper.selectMapTheme((AbstractMapsforgeTileProvider) currentTileProvider, tileCache);
     }
 
     @Override
     public void selectThemeOptions(final Activity activity) {
-        themeHelper.selectMapThemeOptions();
+        themeHelper.selectMapThemeOptions(currentTileProvider);
         doReapplyTheme = true;
     }
 
     @Override
     public void applyTheme() {
-        themeHelper.reapplyMapTheme(((AbstractMapsforgeTileProvider) currentTileProvider).getTileLayer(), tileCache);
+        themeHelper.reapplyMapTheme((AbstractMapsforgeTileProvider) currentTileProvider, tileCache);
     }
 
     @Override

@@ -11,6 +11,9 @@ import cgeo.geocaching.storage.LocalStorage;
 import cgeo.geocaching.storage.PersistableFolder;
 import cgeo.geocaching.storage.extension.OneTimeDialogs;
 import cgeo.geocaching.ui.dialog.Dialogs;
+import cgeo.geocaching.unifiedmap.tileproviders.AbstractMapsforgeOfflineTileProvider;
+import cgeo.geocaching.unifiedmap.tileproviders.AbstractMapsforgeTileProvider;
+import cgeo.geocaching.unifiedmap.tileproviders.AbstractTileProvider;
 import cgeo.geocaching.utils.LocalizationUtils;
 import cgeo.geocaching.utils.Log;
 import cgeo.geocaching.utils.TextUtils;
@@ -39,7 +42,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
 import org.mapsforge.map.android.rendertheme.ContentRenderTheme;
 import org.mapsforge.map.android.rendertheme.ContentResolverResourceProvider;
-import org.mapsforge.map.layer.TileLayer;
 import org.mapsforge.map.layer.cache.TileCache;
 import org.mapsforge.map.layer.renderer.TileRendererLayer;
 import org.mapsforge.map.model.DisplayModel;
@@ -133,16 +135,17 @@ public class MapsforgeThemeHelper implements XmlRenderThemeMenuCallback {
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
     }
 
-    public void reapplyMapTheme(final TileLayer rendererLayer, final TileCache tileCache) {
-        if (!(rendererLayer instanceof TileRendererLayer)) {
+    public void reapplyMapTheme(final AbstractMapsforgeTileProvider tileProvider, final TileCache tileCache) {
+        if (!(tileProvider.getTileLayer() instanceof TileRendererLayer)) {
             return;
         }
+        final TileRendererLayer rendererLayer = (TileRendererLayer) tileProvider.getTileLayer();
 
         //try to apply stored value
         ThemeData selectedTheme = setSelectedMapTheme(Settings.getSelectedMapRenderTheme());
 
         if (selectedTheme == null) {
-            applyDefaultTheme((TileRendererLayer) rendererLayer);
+            applyDefaultTheme(rendererLayer);
         } else {
             try {
                 //get the theme
@@ -150,22 +153,26 @@ public class MapsforgeThemeHelper implements XmlRenderThemeMenuCallback {
 
                 // Validate the theme
                 org.mapsforge.map.rendertheme.rule.RenderThemeHandler.getRenderTheme(AndroidGraphicFactory.INSTANCE, new DisplayModel(), xmlRenderTheme);
-                ((TileRendererLayer) rendererLayer).setXmlRenderTheme(xmlRenderTheme);
+                rendererLayer.setXmlRenderTheme(xmlRenderTheme);
                 //setting xmlrendertheme has filled prefThemeStyleKey -> now apply scales
-                applyScales((TileRendererLayer) rendererLayer, prefThemeStyleKey);
+                applyScales(rendererLayer, prefThemeStyleKey);
             } catch (final IOException e) {
                 Log.w("Failed to set render theme", e);
                 ActivityMixin.showApplicationToast(LocalizationUtils.getString(R.string.err_rendertheme_file_unreadable));
-                ((TileRendererLayer) rendererLayer).setXmlRenderTheme(MapsforgeThemes.OSMARENDER);
+                (rendererLayer).setXmlRenderTheme(MapsforgeThemes.OSMARENDER);
                 selectedTheme = null;
             } catch (final Exception e) {
                 Log.w("render theme invalid", e);
                 ActivityMixin.showApplicationToast(LocalizationUtils.getString(R.string.err_rendertheme_invalid));
-                ((TileRendererLayer) rendererLayer).setXmlRenderTheme(MapsforgeThemes.OSMARENDER);
+                (rendererLayer).setXmlRenderTheme(MapsforgeThemes.OSMARENDER);
                 selectedTheme = null;
             }
         }
         setSelectedTheme(selectedTheme);
+
+        if (tileProvider instanceof AbstractMapsforgeOfflineTileProvider) {
+            ((AbstractMapsforgeOfflineTileProvider) tileProvider).switchBuildingLayer(Settings.getBuildings3D());
+        }
 
         // tile cache needs purging upon theme (re)select
         if (tileCache != null) {
@@ -233,7 +240,7 @@ public class MapsforgeThemeHelper implements XmlRenderThemeMenuCallback {
         return xmlRenderTheme;
     }
 
-    public void selectMapTheme(final TileLayer tileLayer, final TileCache tileCache) {
+    public void selectMapTheme(final AbstractMapsforgeTileProvider tileProvider, final TileCache tileCache) {
         final String currentThemeId = Settings.getSelectedMapRenderTheme();
         final boolean debugMode = Settings.isDebug();
 
@@ -261,18 +268,19 @@ public class MapsforgeThemeHelper implements XmlRenderThemeMenuCallback {
         builder.setSingleChoiceItems(names.toArray(new String[0]), currentItem, (dialog, newItem) -> {
             // Adjust index because of <default> selection
             setSelectedTheme(newItem > 0 ? selectableAvThemes.get(newItem - 1) : null);
-            reapplyMapTheme(tileLayer, tileCache);
+            reapplyMapTheme(tileProvider, tileCache);
             dialog.cancel();
         });
 
         builder.show();
     }
 
-    public void selectMapThemeOptions() {
+    public void selectMapThemeOptions(final AbstractTileProvider tileProvider) {
         final Intent intent = new Intent(activity, MapsforgeThemeSettings.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         if (themeOptionsAvailable() && themeStyleMenu != null) {
             intent.putExtra(MapsforgeThemeSettingsFragment.RENDERTHEME_MENU, themeStyleMenu);
+            intent.putExtra(MapsforgeThemeSettingsFragment.SHOW3DOPTION, tileProvider instanceof AbstractMapsforgeOfflineTileProvider);
         }
         activity.startActivity(intent);
     }
