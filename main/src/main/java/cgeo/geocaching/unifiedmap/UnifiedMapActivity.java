@@ -1062,7 +1062,7 @@ public class UnifiedMapActivity extends AbstractNavigationBarMapActivity impleme
         }
         Log.d("touched elements on " + touchedPoint + " (" + result.size() + "): " + result);
 
-        if (result.size() == 0) {
+        if (result.isEmpty()) {
             if (isLongTap) {
                 viewModel.longTapCoords.setValue(touchedPoint);
                 MapUtils.createMapLongClickPopupMenu(this, touchedPoint, new Point(x, y), viewModel.individualRoute.getValue(), route -> viewModel.individualRoute.notifyDataChanged(), this::updateRouteTrackButtonVisibility, getCurrentTargetCache(), new MapOptions(null, "", mapType.fromList), viewModel::setTarget)
@@ -1070,6 +1070,11 @@ public class UnifiedMapActivity extends AbstractNavigationBarMapActivity impleme
                         .show();
             } else {
                 if (sheetRemoveFragment()) {
+                    return;
+                }
+                final View rotationMenu = findViewById(R.id.container_rotationmenu);
+                if (rotationMenu != null && rotationMenu.getVisibility() == View.VISIBLE) {
+                    rotationMenu.setVisibility(View.GONE);
                     return;
                 }
                 mapFragment.adaptLayoutForActionBar(HideActionBarUtils.toggleActionBar(this));
