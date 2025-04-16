@@ -452,6 +452,9 @@ dependencies {
     // somehow there is a transitive play service dependency which we don't want
     configurations.all*.exclude module: "play-services-measurement"
 
+    // Android Car
+    implementation 'androidx.car.app:app:1.4.0'
+
     // Support Library Design
     implementation 'com.google.android.material:material:1.9.0'
 
@@ -543,6 +546,8 @@ dependencies {
     // Offline translation - language detection and translator
     implementation 'com.google.mlkit:language-id:17.0.6'
     implementation 'com.google.mlkit:translate:17.0.3'
+
+    implementation 'com.google.guava:guava:27.0.1-jre'
 }
 
 // define objects for files/folders outside tasks

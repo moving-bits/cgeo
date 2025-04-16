@@ -38,6 +38,8 @@
         android:name="android.hardware.touchscreen"
         android:required="false" />
 
+    <uses-permission android:name="androidx.car.app.MAP_TEMPLATES"/>
+
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -96,6 +98,14 @@
         <meta-data
             android:name="android.max_aspect"
             android:value="3.0" />
+
+        <!-- support Android Car -->
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/car_description" />
+        <meta-data
+            android:name="androidx.car.app.minCarApiLevel"
+            android:value="1" />
 
         <activity
             android:name=".SplashActivity"
@@ -837,6 +847,14 @@
             android:enabled="true"
             android:stopWithTask="true"
             android:foregroundServiceType="location">
+        </service>
+        <service
+            android:name=".carservice.CarService"
+            android:exported="true"> <!-- android:permission="TODO"> -->
+            <intent-filter>
+                <action android:name="androidx.car.app.CarAppService" />
+                <category android:name="androidx.car.app.category.POI" />
+            </intent-filter>
         </service>
 
         <activity
