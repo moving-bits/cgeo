@@ -20,7 +20,12 @@ public abstract class AbstractForegroundIntentService extends IntentService {
 
     public AbstractForegroundIntentService() {
         super(logTag);
-        setIntentRedelivery(true);
+        // Do NOT enable intent redelivery: the service relies on static in-memory state
+        // (e.g. CacheDownloaderService.downloadQuery) that is lost when the process dies.
+        // Additionally, a system-scheduled restart of a foreground service from the
+        // background can fail on Android 12+ with ForegroundServiceStartNotAllowedException,
+        // which manifests as "Unable to create service ...".
+        setIntentRedelivery(false);
     }
 
     protected abstract NotificationCompat.Builder createInitialNotification();
@@ -42,7 +47,16 @@ public abstract class AbstractForegroundIntentService extends IntentService {
                 .setOnlyAlertOnce(true)
                 .setSilent(true);
 
-        startForeground(getForegroundNotificationId(), notification.build());
+        try {
+            startForeground(getForegroundNotificationId(), notification.build());
+        } catch (Exception e) {
+            // On Android 12+ startForeground() can throw ForegroundServiceStartNotAllowedException
+            // when invoked from a background context (e.g. system-triggered restart). Bail out
+            // cleanly instead of letting ActivityThread wrap this into a fatal
+            // "Unable to create service" RuntimeException.
+            Log.e(logTag + " - startForeground failed, stopping service", e);
+            stopSelf();
+        }
     }
 
 
