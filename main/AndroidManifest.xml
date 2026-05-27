@@ -968,10 +968,8 @@
             android:name=".downloader.ReceiveDownloadService"
             android:foregroundServiceType="dataSync"/>
 
-        <!-- Background cache downloader -->
-        <service
-            android:name=".service.CacheDownloaderService"
-            android:foregroundServiceType="dataSync"/>
+        <!-- Background cache downloader: work runs in CacheDownloaderWorker via WorkManager.
+             Receiver below handles the "cancel" action in the worker's progress notification. -->
         <receiver android:name=".service.StopCacheDownloadServiceReceiver"/>
 
         <!-- Receiver for custom tabs share intent -->

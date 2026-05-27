@@ -2,29 +2,25 @@ package cgeo.geocaching.service;
 
 import cgeo.geocaching.R;
 import cgeo.geocaching.activity.ActivityMixin;
-import cgeo.geocaching.enumerations.LoadFlags;
 import cgeo.geocaching.list.StoredList;
 import cgeo.geocaching.models.Geocache;
 import cgeo.geocaching.settings.Settings;
 import cgeo.geocaching.storage.DataStore;
 import cgeo.geocaching.ui.ViewUtils;
 import cgeo.geocaching.ui.dialog.Dialogs;
-import cgeo.geocaching.ui.notifications.NotificationChannels;
-import cgeo.geocaching.ui.notifications.Notifications;
-import cgeo.geocaching.utils.AndroidRxUtils;
 import cgeo.geocaching.utils.LocalizationUtils;
 import cgeo.geocaching.utils.Log;
 
 import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RadioGroup;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,23 +29,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import io.reactivex.rxjava3.functions.Function;
-
-public class CacheDownloaderService extends AbstractForegroundIntentService {
-    static {
-        logTag = "CacheDownloaderService";
-    }
-
-    private static final String EXTRA_GEOCODES = "extra_geocodes";
+/**
+ * Entry point for starting background cache downloads.
+ * <p>
+ * Despite the historical {@code Service} suffix, this class is no longer an Android service:
+ * the actual download work runs in {@link CacheDownloaderWorker} via {@link WorkManager}.
+ * The public static API is preserved for callers throughout the app.
+ */
+public final class CacheDownloaderService {
 
     private static volatile boolean shouldStop = false;
-    private static final Map<String, DownloadTaskProperties> downloadQuery = new HashMap<>();
+    static final Map<String, DownloadTaskProperties> downloadQuery = new HashMap<>();
 
-    final AtomicInteger cachesDownloaded = new AtomicInteger();
+    private CacheDownloaderService() {
+        // no instances
+    }
 
     public static boolean isDownloadPending(final String geocode) {
         return downloadQuery.containsKey(geocode);
@@ -86,7 +81,6 @@ public class CacheDownloaderService extends AbstractForegroundIntentService {
                     if (id == R.id.radio_button_refresh_and_add) {
                         askForListsIfNecessaryAndDownload(context, geocodes, false, true, false, onStartCallback);
                     } else if (id == R.id.radio_button_refresh_and_keep) {
-                        // downloadCachesInternal(context, geocodes, null, true, onStartCallback);
                         askForListsIfNecessaryAndDownload(context, geocodes, true, true, false, onStartCallback);
                     } else if (id == R.id.radio_button_add_to_list) {
                         askForListsIfNecessaryAndDownload(context, geocodes, false, false, false, onStartCallback);
@@ -146,9 +140,21 @@ public class CacheDownloaderService extends AbstractForegroundIntentService {
 
         Log.d("DOWNLOAD: " + newGeocodes);
 
-        final Intent intent = new Intent(context, CacheDownloaderService.class);
-        intent.putStringArrayListExtra(EXTRA_GEOCODES, newGeocodes);
-        ContextCompat.startForegroundService(context, intent);
+        // a fresh user-initiated batch clears a previous stop request; subsequent batches enqueued
+        // before this point share that reset (they were enqueued while shouldStop was still false anyway).
+        shouldStop = false;
+
+        final Data inputData = new Data.Builder()
+                .putStringArray(CacheDownloaderWorker.EXTRA_GEOCODES, newGeocodes.toArray(new String[0]))
+                .build();
+        final OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(CacheDownloaderWorker.class)
+                .setInputData(inputData)
+                .build();
+        // APPEND_OR_REPLACE keeps batches in a single queue so they're processed sequentially,
+        // matching the previous IntentService behaviour.
+        WorkManager.getInstance(context.getApplicationContext())
+                .beginUniqueWork(CacheDownloaderWorker.UNIQUE_WORK_NAME, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
+                .enqueue();
         ViewUtils.showToast(context, R.string.download_started);
 
         if (onStartCallback != null) {
@@ -160,114 +166,11 @@ public class CacheDownloaderService extends AbstractForegroundIntentService {
         shouldStop = true;
     }
 
-    @Override
-    public NotificationCompat.Builder createInitialNotification() {
-        shouldStop = false;
-        final PendingIntent actionCancelIntent = PendingIntent.getBroadcast(this, 0,
-                new Intent(this, StopCacheDownloadServiceReceiver.class),
-                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-
-        return Notifications.createNotification(this, NotificationChannels.FOREGROUND_SERVICE_NOTIFICATION, R.string.caches_store_background_title)
-                .setProgress(100, 0, true)
-                .addAction(R.drawable.ic_menu_cancel, LocalizationUtils.getString(android.R.string.cancel), actionCancelIntent);
+    static boolean isStopRequested() {
+        return shouldStop;
     }
 
-    @Override
-    protected int getForegroundNotificationId() {
-        return Notifications.ID_FOREGROUND_NOTIFICATION_CACHES_DOWNLOADER;
-    }
-
-    @Override
-    protected void onHandleIntent(final @Nullable Intent intent) {
-        if (intent == null) {
-            return;
-        }
-
-        // schedule download on multiple threads...
-
-        Log.d("Download task started");
-
-        final Observable<String> geocodes = Observable.fromIterable(intent.getStringArrayListExtra(EXTRA_GEOCODES));
-        geocodes.flatMap((Function<String, Observable<String>>) geocode -> Observable.create((ObservableOnSubscribe<String>) emitter -> {
-            handleDownload(geocode);
-            emitter.onComplete();
-        }).subscribeOn(AndroidRxUtils.refreshScheduler)).blockingSubscribe();
-
-        Log.d("Download task completed");
-    }
-
-    private void handleDownload(final String geocode) {
-        try {
-            if (shouldStop) {
-                Log.i("download canceled");
-                return;
-            }
-
-            Log.d("Download #" + cachesDownloaded.get() + " " + geocode + " started");
-
-            final DownloadTaskProperties properties;
-            synchronized (downloadQuery) {
-                properties = downloadQuery.put(geocode, null); // set the properties to null, to point out that the download is currently ongoing
-
-            }
-            if (properties == null) {
-                throw new IllegalStateException("The cache is not present in the download query");
-            }
-
-            // update foreground service notification
-            notification.setProgress(downloadQuery.size() + cachesDownloaded.get(), cachesDownloaded.get(), false);
-            notification.setContentText(cachesDownloaded.get() + "/" + (downloadQuery.size() + cachesDownloaded.get()));
-            updateForegroundNotification();
-
-            // merge current lists and additional lists
-            final Set<Integer> combinedListIds = new HashSet<>(properties.listIds);
-            final Geocache cache = DataStore.loadCache(geocode, LoadFlags.LOAD_CACHE_OR_DB);
-            if (cache != null && !cache.getLists().isEmpty()) {
-                if (properties.keepExistingLists) {
-                    combinedListIds.clear();
-                }
-                combinedListIds.addAll(cache.getLists());
-            }
-
-            // download...
-            if (Geocache.storeCache(null, geocode, combinedListIds, properties.forceDownload, null)) {
-                // send a broadcast so that foreground activities know that they might need to update their content
-                GeocacheChangedBroadcastReceiver.sendBroadcast(this, geocode);
-                // check whether the download properties are still null,
-                // otherwise there is a new download task...
-                synchronized (downloadQuery) {
-                    if (downloadQuery.get(geocode) == null) {
-                        downloadQuery.remove(geocode);
-                    }
-                }
-                Log.d("Download #" + cachesDownloaded.get() + " " + geocode + " completed");
-                cachesDownloaded.incrementAndGet();
-            } else {
-                Log.d("Download #" + cachesDownloaded.get() + " " + geocode + " failed");
-            }
-        } catch (Exception ex) {
-            Log.e("exception while background download", ex);
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        if (!downloadQuery.isEmpty()) {
-            showEndNotification(LocalizationUtils.getString(shouldStop ? R.string.caches_store_background_result_canceled : R.string.caches_store_background_result_failed,
-                    cachesDownloaded.get(), cachesDownloaded.get() + downloadQuery.size()));
-        } else if (cachesDownloaded.get() != 1) { // see #15881
-            showEndNotification(LocalizationUtils.getPlural(R.plurals.caches_store_background_result, cachesDownloaded.get()));
-        }
-        downloadQuery.clear();
-        super.onDestroy();
-    }
-
-    private void showEndNotification(final String text) {
-        Notifications.send(this, Settings.getUniqueNotificationId(), Notifications.createTextContentNotification(
-                this, NotificationChannels.CACHES_DOWNLOADED_NOTIFICATION, R.string.caches_store_background_title, text).setSilent(true));
-    }
-
-    private static class DownloadTaskProperties {
+    static class DownloadTaskProperties {
         final Set<Integer> listIds = new HashSet<>();
         boolean forceDownload;
         boolean keepExistingLists;

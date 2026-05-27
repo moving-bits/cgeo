@@ -20,11 +20,11 @@ public abstract class AbstractForegroundIntentService extends IntentService {
 
     public AbstractForegroundIntentService() {
         super(logTag);
-        // Do NOT enable intent redelivery: the service relies on static in-memory state
-        // (e.g. CacheDownloaderService.downloadQuery) that is lost when the process dies.
-        // Additionally, a system-scheduled restart of a foreground service from the
-        // background can fail on Android 12+ with ForegroundServiceStartNotAllowedException,
-        // which manifests as "Unable to create service ...".
+        // Do NOT enable intent redelivery: a system-scheduled restart of a foreground service
+        // from the background can fail on Android 12+ with ForegroundServiceStartNotAllowedException,
+        // which manifests as "Unable to create service ...". Subclasses also typically rely on
+        // in-memory state that is lost when the process dies, so a blind redelivery wouldn't
+        // resume work correctly anyway.
         setIntentRedelivery(false);
     }
 
