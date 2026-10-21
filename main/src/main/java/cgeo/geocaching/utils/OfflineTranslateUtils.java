@@ -132,6 +132,9 @@ public class OfflineTranslateUtils {
         final Consumer<ITranslatorImpl> receiveTranslator = translator -> {
             if (!translationStatus.runIfCurrent(generation, () -> {
                 if (translator != null) {
+                    if (activity instanceof CacheDetailActivity) {
+                        translator.setQueue(((CacheDetailActivity) activity).getTranslationQueue());
+                    }
                     translationStatus.addTranslationTask(Disposable.fromRunnable(translator::dispose));
                 }
                 translatorConsumer.accept(translator);

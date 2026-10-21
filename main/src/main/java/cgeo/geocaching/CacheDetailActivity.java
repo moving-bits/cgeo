@@ -113,6 +113,7 @@ import cgeo.geocaching.utils.html.HtmlUtils;
 import cgeo.geocaching.utils.html.UnknownTagsHandler;
 import cgeo.geocaching.utils.offlinetranslate.ITranslatorImpl;
 import cgeo.geocaching.utils.offlinetranslate.TranslationCache;
+import cgeo.geocaching.utils.offlinetranslate.TranslationQueue;
 import cgeo.geocaching.utils.offlinetranslate.TranslatorUtils;
 import cgeo.geocaching.wherigo.WherigoViewUtils;
 
@@ -243,6 +244,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
 
     private final CompositeDisposable createDisposables = new CompositeDisposable();
     private TranslationCache.Scope translationCacheScope;
+    private final TranslationQueue translationQueue = new TranslationQueue();
     private String translationCacheOwner;
     /**
      * waypoint selected in context menu. This variable will be gone when the waypoint context menu is a fragment.
@@ -464,6 +466,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
     @Override
     public void onResume() {
         super.onResume();
+        translationQueue.resume();
 
         // resume location access
         startOrStopGeoDataListener(true);
@@ -476,12 +479,14 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
 
     @Override
     public void onPause() {
+        translationQueue.pause();
         geoDataDisposable.clear();
         super.onPause();
     }
 
     @Override
     public void onDestroy() {
+        translationQueue.dispose();
         translationStatus.abortTranslation();
         if (translationCacheScope != null) {
             translationCacheScope.close(isFinishing());
@@ -505,6 +510,10 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
             translationCacheScope = TranslatorUtils.openCacheScope(translationCacheOwner);
         }
         return translationCacheScope;
+    }
+
+    public TranslationQueue getTranslationQueue() {
+        return translationQueue;
     }
 
     @Override

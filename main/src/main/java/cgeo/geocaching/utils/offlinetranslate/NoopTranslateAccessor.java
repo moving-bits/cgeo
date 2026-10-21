@@ -53,6 +53,12 @@ public class NoopTranslateAccessor implements ITranslateAccessor {
     public ITranslatorImpl getTranslator(final String sourceLanguage, final String targetLanguage) {
         return new ITranslatorImpl() {
             private final CompositeDisposable tasks = new CompositeDisposable();
+            private volatile TranslationQueue queue;
+
+            @Override
+            public void setQueue(final TranslationQueue queue) {
+                this.queue = queue;
+            }
 
             @Override
             public String getSourceLanguage() {
@@ -67,7 +73,7 @@ public class NoopTranslateAccessor implements ITranslateAccessor {
             @Override
             public Disposable translate(final String source, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
                 final Scheduler callbacks = scheduler != null ? scheduler : AndroidRxUtils.mainThreadScheduler;
-                return TranslationTask.schedule(tasks, callbacks, callbacks, () -> source, onSuccess, onError);
+                return TranslationTask.schedule(tasks, callbacks, callbacks, queue, () -> source, onSuccess, onError);
             }
 
             @Override

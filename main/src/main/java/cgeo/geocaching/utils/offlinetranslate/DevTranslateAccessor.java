@@ -65,6 +65,12 @@ public class DevTranslateAccessor implements ITranslateAccessor {
     public ITranslatorImpl getTranslator(final String sourceLanguage, final String targetLanguage) {
         return new ITranslatorImpl() {
             private final CompositeDisposable tasks = new CompositeDisposable();
+            private volatile TranslationQueue queue;
+
+            @Override
+            public void setQueue(final TranslationQueue queue) {
+                this.queue = queue;
+            }
 
             @Override
             public String getSourceLanguage() {
@@ -79,7 +85,7 @@ public class DevTranslateAccessor implements ITranslateAccessor {
             @Override
             public Disposable translate(final String source, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
                 final Scheduler callbacks = scheduler != null ? scheduler : AndroidRxUtils.mainThreadScheduler;
-                return TranslationTask.schedule(tasks, AndroidRxUtils.computationScheduler, callbacks,
+                return TranslationTask.schedule(tasks, AndroidRxUtils.computationScheduler, callbacks, queue,
                         () -> "[" + sourceLanguage + "->" + targetLanguage + "]" + source, onSuccess, onError, 2, TimeUnit.SECONDS);
             }
 

@@ -54,10 +54,29 @@ public class CachedTranslationTest {
         assertThat(results).isEmpty();
     }
 
+    @Test
+    public void cacheMissHonorsTheActivityQueue() {
+        final TestScheduler scheduler = new TestScheduler();
+        final TestTranslator translator = new TestTranslator(scheduler);
+        final TranslationQueue activity = new TranslationQueue();
+        translator.setQueue(activity);
+        final TranslationCache.Scope scope = new TranslationCache(2000).openScope("GC1");
+        final List<String> results = new ArrayList<>();
+        TranslatorUtils.translateCached(scope, translator, "source", scheduler, results::add, error -> results.add("error"));
+        scheduler.triggerActions();
+        assertThat(translator.nativeCalls).isZero();
+        assertThat(results).isEmpty();
+        activity.resume();
+        scheduler.triggerActions();
+        assertThat(translator.nativeCalls).isEqualTo(1);
+        assertThat(results).containsExactly("translated");
+    }
+
     private static class TestTranslator implements ITranslatorImpl {
         private final TestScheduler scheduler;
         private final CompositeDisposable tasks = new CompositeDisposable();
         private int nativeCalls;
+        private TranslationQueue queue;
 
         TestTranslator(final TestScheduler scheduler) {
             this.scheduler = scheduler;
@@ -75,10 +94,15 @@ public class CachedTranslationTest {
 
         @Override
         public Disposable translate(final String source, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
-            return TranslationTask.schedule(tasks, scheduler, scheduler, () -> {
+            return TranslationTask.schedule(tasks, scheduler, scheduler, queue, () -> {
                 nativeCalls++;
                 return "translated";
             }, onSuccess, onError);
+        }
+
+        @Override
+        public void setQueue(final TranslationQueue queue) {
+            this.queue = queue;
         }
 
         @Override

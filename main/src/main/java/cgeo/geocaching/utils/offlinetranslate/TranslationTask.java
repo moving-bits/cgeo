@@ -11,7 +11,9 @@ import io.reactivex.rxjava3.disposables.Disposable;
 /** A cancellable translation which never interrupts an already running native call. */
 final class TranslationTask implements Disposable {
     private final CompositeDisposable owner;
+    private final Scheduler scheduler;
     private final Scheduler callbackScheduler;
+    private final TranslationQueue queue;
     private Callable<String> action;
     private Consumer<String> onSuccess;
     private Consumer<Exception> onError;
@@ -21,10 +23,12 @@ final class TranslationTask implements Disposable {
     private boolean callbackStarted;
     private boolean disposed;
 
-    private TranslationTask(final CompositeDisposable owner, final Scheduler callbackScheduler,
+    private TranslationTask(final CompositeDisposable owner, final Scheduler scheduler, final Scheduler callbackScheduler, final TranslationQueue queue,
                             final Callable<String> action, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
         this.owner = owner;
+        this.scheduler = scheduler;
         this.callbackScheduler = callbackScheduler;
+        this.queue = queue;
         this.action = action;
         this.onSuccess = onSuccess;
         this.onError = onError;
@@ -38,29 +42,53 @@ final class TranslationTask implements Disposable {
     static Disposable schedule(final CompositeDisposable owner, final Scheduler scheduler, final Scheduler callbackScheduler,
                                final Callable<String> action, final Consumer<String> onSuccess, final Consumer<Exception> onError,
                                final long delay, final TimeUnit unit) {
-        final TranslationTask task = new TranslationTask(owner, callbackScheduler, action, onSuccess, onError);
-        if (owner.add(task)) {
-            final Disposable work = scheduler.scheduleDirect(task::execute, delay, unit);
-            synchronized (task) {
-                if (task.disposed && !task.running) {
-                    work.dispose();
-                } else {
-                    task.work = work;
-                }
-            }
+        return schedule(owner, scheduler, callbackScheduler, null, action, onSuccess, onError, delay, unit);
+    }
+
+    static Disposable schedule(final CompositeDisposable owner, final Scheduler scheduler, final Scheduler callbackScheduler,
+                               final TranslationQueue queue, final Callable<String> action,
+                               final Consumer<String> onSuccess, final Consumer<Exception> onError) {
+        return schedule(owner, scheduler, callbackScheduler, queue, action, onSuccess, onError, 0, TimeUnit.MILLISECONDS);
+    }
+
+    static Disposable schedule(final CompositeDisposable owner, final Scheduler scheduler, final Scheduler callbackScheduler,
+                               final TranslationQueue queue, final Callable<String> action,
+                               final Consumer<String> onSuccess, final Consumer<Exception> onError, final long delay, final TimeUnit unit) {
+        final TranslationTask task = new TranslationTask(owner, scheduler, callbackScheduler, queue, action, onSuccess, onError);
+        if (owner.add(task) && (queue == null || queue.add(task))) {
+            task.scheduleWork(delay, unit);
         }
         return task;
     }
 
-    private void execute() {
-        final Callable<String> translate;
+    void scheduleWork(final long delay, final TimeUnit unit) {
+        if (isDisposed()) {
+            return;
+        }
+        final Disposable scheduled = scheduler.scheduleDirect(this::execute, delay, unit);
         synchronized (this) {
-            if (disposed) {
-                return;
+            if (disposed && !running) {
+                scheduled.dispose();
+            } else {
+                work = scheduled;
             }
-            running = true;
-            translate = action;
-            action = null;
+        }
+    }
+
+    synchronized Callable<String> claim() {
+        if (disposed || action == null) {
+            return null;
+        }
+        running = true;
+        final Callable<String> translate = action;
+        action = null;
+        return translate;
+    }
+
+    private void execute() {
+        final Callable<String> translate = queue == null ? claim() : queue.startOrDefer(this);
+        if (translate == null) {
+            return;
         }
         String result = null;
         Exception failure = null;
@@ -111,6 +139,9 @@ final class TranslationTask implements Disposable {
             delivery = null;
         }
         owner.delete(this);
+        if (queue != null) {
+            queue.remove(this);
+        }
         // Invoke application callbacks outside the task lock to avoid lock inversion on abort.
         if (failure == null) {
             success.accept(result);
@@ -120,20 +151,25 @@ final class TranslationTask implements Disposable {
     }
 
     @Override
-    public synchronized void dispose() {
-        disposed = true;
-        action = null;
-        onSuccess = null;
-        onError = null;
-        if (!running && work != null) {
-            work.dispose();
+    public void dispose() {
+        synchronized (this) {
+            disposed = true;
+            action = null;
+            onSuccess = null;
+            onError = null;
+            if (!running && work != null) {
+                work.dispose();
+            }
+            if (!callbackStarted && delivery != null) {
+                delivery.dispose();
+            }
+            work = null;
+            delivery = null;
         }
-        if (!callbackStarted && delivery != null) {
-            delivery.dispose();
-        }
-        work = null;
-        delivery = null;
         owner.delete(this);
+        if (queue != null) {
+            queue.remove(this);
+        }
     }
 
     @Override

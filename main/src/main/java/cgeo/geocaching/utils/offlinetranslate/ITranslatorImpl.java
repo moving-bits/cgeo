@@ -12,5 +12,8 @@ public interface ITranslatorImpl {
 
     Disposable translate(String source, Consumer<String> onSuccess, Consumer<Exception> onError);
 
+    /** Set before submitting requests so admission can be checked on the actual translation worker. */
+    void setQueue(TranslationQueue queue);
+
     void dispose();
 }

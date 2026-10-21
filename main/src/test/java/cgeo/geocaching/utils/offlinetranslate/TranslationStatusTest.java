@@ -36,6 +36,11 @@ public class TranslationStatusTest {
             }
 
             @Override
+            public void setQueue(final TranslationQueue queue) {
+                // This fake has no worker; the status test drives its callback explicitly.
+            }
+
+            @Override
             public void dispose() {
                 // This test verifies cancellation of the returned request handle.
             }

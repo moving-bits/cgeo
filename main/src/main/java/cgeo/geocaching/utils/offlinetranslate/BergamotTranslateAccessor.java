@@ -295,6 +295,12 @@ public class BergamotTranslateAccessor implements ITranslateAccessor {
     private ITranslatorImpl createTranslatorImpl(final String sourceLang, final String targetLang) {
         return new ITranslatorImpl() {
             private final CompositeDisposable tasks = new CompositeDisposable();
+            private volatile TranslationQueue queue;
+
+            @Override
+            public void setQueue(final TranslationQueue queue) {
+                this.queue = queue;
+            }
 
             @Override
             public String getSourceLanguage() {
@@ -309,7 +315,7 @@ public class BergamotTranslateAccessor implements ITranslateAccessor {
             @Override
             public Disposable translate(final String source, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
                 final Scheduler callbacks = callbackScheduler != null ? callbackScheduler : AndroidSchedulers.mainThread();
-                return TranslationTask.schedule(tasks, NATIVE_SCHEDULER, callbacks, () -> {
+                return TranslationTask.schedule(tasks, NATIVE_SCHEDULER, callbacks, queue, () -> {
                     final String[] result;
                     // skip translation if src == target
                     if (sourceLang.equals(targetLang)) {
