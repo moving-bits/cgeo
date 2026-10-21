@@ -112,6 +112,8 @@ import cgeo.geocaching.utils.html.HtmlStyle;
 import cgeo.geocaching.utils.html.HtmlUtils;
 import cgeo.geocaching.utils.html.UnknownTagsHandler;
 import cgeo.geocaching.utils.offlinetranslate.ITranslatorImpl;
+import cgeo.geocaching.utils.offlinetranslate.TranslationCache;
+import cgeo.geocaching.utils.offlinetranslate.TranslatorUtils;
 import cgeo.geocaching.wherigo.WherigoViewUtils;
 
 import android.annotation.SuppressLint;
@@ -204,6 +206,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
     public static final String STATE_DESCRIPTION_STYLE = "cgeo.geocaching.descriptionStyle";
     public static final String STATE_SPEECHSERVICE_RUNNING = "cgeo.geocaching.speechServiceRunning";
     public static final String STATE_TRANSLATION_LANGUAGE_SOURCE = "cgeo.geocaching.translation.languageSource";
+    private static final String STATE_TRANSLATION_CACHE_OWNER = "cgeo.geocaching.translation.cacheOwner";
 
 
     // Store Geocode here, as 'cache' is loaded Async.
@@ -239,6 +242,8 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
     private Bundle imageGalleryState = null;
 
     private final CompositeDisposable createDisposables = new CompositeDisposable();
+    private TranslationCache.Scope translationCacheScope;
+    private String translationCacheOwner;
     /**
      * waypoint selected in context menu. This variable will be gone when the waypoint context menu is a fragment.
      */
@@ -258,6 +263,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        translationCacheOwner = savedInstanceState == null ? null : savedInstanceState.getString(STATE_TRANSLATION_CACHE_OWNER);
         setThemeAndContentView(R.layout.tabbed_viewpager_activity_refreshable);
 
         // get parameters
@@ -439,6 +445,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
         outState.putInt(STATE_SPEECHSERVICE_RUNNING, SpeechService.isRunning() ? 1 : 0);
 
         outState.putString(STATE_TRANSLATION_LANGUAGE_SOURCE, this.translationStatus.isTranslated() ? this.translationStatus.getSourceLanguage().getCode() : "");
+        outState.putString(STATE_TRANSLATION_CACHE_OWNER, cache != null ? cache.getGeocode() : translationCacheOwner);
     }
 
     private void startOrStopGeoDataListener(final boolean initial) {
@@ -475,11 +482,29 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
 
     @Override
     public void onDestroy() {
+        translationStatus.abortTranslation();
+        if (translationCacheScope != null) {
+            translationCacheScope.close(isFinishing());
+        } else if (isFinishing()) {
+            // A recreated activity may finish without requesting another translation.
+            final String cacheCode = cache != null ? cache.getGeocode() : StringUtils.defaultIfBlank(translationCacheOwner, geocode);
+            if (StringUtils.isNotBlank(cacheCode)) {
+                TranslatorUtils.openCacheScope(cacheCode).close(true);
+            }
+        }
         createDisposables.clear();
         if (cache != null) {
             cache.setChangeNotificationHandler(null);
         }
         super.onDestroy();
+    }
+
+    public TranslationCache.Scope getTranslationCacheScope() {
+        if (translationCacheScope == null) {
+            translationCacheOwner = cache.getGeocode();
+            translationCacheScope = TranslatorUtils.openCacheScope(translationCacheOwner);
+        }
+        return translationCacheScope;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package cgeo.geocaching.utils;
 
+import cgeo.geocaching.CacheDetailActivity;
 import cgeo.geocaching.R;
 import cgeo.geocaching.activity.AbstractActivity;
 import cgeo.geocaching.activity.TabbedViewPagerActivity;
@@ -9,7 +10,9 @@ import cgeo.geocaching.ui.TextParam;
 import cgeo.geocaching.ui.dialog.SimpleDialog;
 import cgeo.geocaching.utils.offlinetranslate.ITranslatorImpl;
 import cgeo.geocaching.utils.offlinetranslate.TranslateAccessor;
+import cgeo.geocaching.utils.offlinetranslate.TranslationCache;
 import cgeo.geocaching.utils.offlinetranslate.TranslationModelManager;
+import cgeo.geocaching.utils.offlinetranslate.TranslatorUtils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -122,6 +125,9 @@ public class OfflineTranslateUtils {
         final long generation = translationStatus.getGeneration();
         if (!translationStatus.isCurrent(generation)) {
             return;
+        }
+        if (activity instanceof CacheDetailActivity) {
+            translationStatus.setCacheScope(((CacheDetailActivity) activity).getTranslationCacheScope());
         }
         final Consumer<ITranslatorImpl> receiveTranslator = translator -> {
             if (!translationStatus.runIfCurrent(generation, () -> {
@@ -364,6 +370,7 @@ public class OfflineTranslateUtils {
 
     public static class Status {
         private CompositeDisposable translationTasks = new CompositeDisposable();
+        private TranslationCache.Scope cacheScope;
         private long generation;
         private Language sourceLanguage = new Language(LANGUAGE_INVALID);
         private TranslationProgressHandler progressHandler;
@@ -394,6 +401,10 @@ public class OfflineTranslateUtils {
             translationTasks.add(task);
         }
 
+        public synchronized void setCacheScope(final TranslationCache.Scope scope) {
+            cacheScope = scope;
+        }
+
         public synchronized void translate(final ITranslatorImpl translator, final String text,
                                            final Consumer<String> onSuccess, final Consumer<Exception> onError) {
             if (translationTasks.isDisposed()) {
@@ -401,9 +412,10 @@ public class OfflineTranslateUtils {
             }
             final long currentGeneration = generation;
             final CompositeDisposable currentTasks = translationTasks;
-            currentTasks.add(translator.translate(text,
-                    result -> runIfCurrent(currentGeneration, () -> onSuccess.accept(result)),
-                    error -> runIfCurrent(currentGeneration, () -> onError.accept(error))));
+            final Consumer<String> success = result -> runIfCurrent(currentGeneration, () -> onSuccess.accept(result));
+            final Consumer<Exception> failure = error -> runIfCurrent(currentGeneration, () -> onError.accept(error));
+            currentTasks.add(cacheScope == null ? translator.translate(text, success, failure)
+                    : TranslatorUtils.translateCached(cacheScope, translator, text, success, failure));
         }
 
         public Language getSourceLanguage() {

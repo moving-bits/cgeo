@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /** LRU cache budgeted by estimated retained bytes, including keys and values. */
-final class TranslationCache {
+public final class TranslationCache {
     private final long maxBytes;
     private final Map<String, String> entries = new LinkedHashMap<>(16, 0.75f, true);
     private long bytes;
@@ -42,6 +42,58 @@ final class TranslationCache {
 
     synchronized long sizeInBytes() {
         return bytes;
+    }
+
+    Scope openScope(final String geocode) {
+        // Length-delimited ownership prevents e.g. GC1 from matching GC10 on eviction.
+        return new Scope(this, "cache:" + geocode.length() + ":" + geocode + ":");
+    }
+
+    private synchronized void removePrefix(final String prefix) {
+        final Iterator<Map.Entry<String, String>> iterator = entries.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Map.Entry<String, String> entry = iterator.next();
+            if (entry.getKey().startsWith(prefix)) {
+                bytes -= entryBytes(entry.getKey(), entry.getValue());
+                iterator.remove();
+            }
+        }
+    }
+
+    /** An activity's cache access; closing also rejects results from late callbacks. */
+    public static final class Scope {
+        private final TranslationCache cache;
+        private final String prefix;
+        private boolean closed;
+
+        private Scope(final TranslationCache cache, final String prefix) {
+            this.cache = cache;
+            this.prefix = prefix;
+        }
+
+        String get(final String key) {
+            synchronized (cache) {
+                return closed ? null : cache.get(prefix + key);
+            }
+        }
+
+        void put(final String key, final String value) {
+            synchronized (cache) {
+                if (!closed) {
+                    cache.put(prefix + key, value);
+                }
+            }
+        }
+
+        /** Preserve entries on recreation; remove this geocache's entries on finish. */
+        public void close(final boolean clearEntries) {
+            synchronized (cache) {
+                closed = true;
+                if (clearEntries) {
+                    cache.removePrefix(prefix);
+                }
+            }
+        }
     }
 
     private static long entryBytes(final String key, final String value) {

@@ -57,4 +57,72 @@ public class TranslationCacheTest {
         assertThat(cache.get("source")).isNull();
         assertThat(cache.sizeInBytes()).isZero();
     }
+
+    @Test
+    public void finishingClearsOnlyTheSelectedGeocache() {
+        final TranslationCache cache = new TranslationCache(2000);
+        final TranslationCache.Scope first = cache.openScope("GC1");
+        final TranslationCache.Scope second = cache.openScope("GC10");
+        first.put("en:de:source", "first translation");
+        second.put("en:de:source", "second translation");
+        cache.put("global:en:de:source", "unrelated translation");
+        first.close(true);
+        assertThat(cache.openScope("GC1").get("en:de:source")).isNull();
+        assertThat(second.get("en:de:source")).isEqualTo("second translation");
+        assertThat(cache.get("global:en:de:source")).isEqualTo("unrelated translation");
+    }
+
+    @Test
+    public void lateResultCannotRepopulateFinishedScope() {
+        final TranslationCache cache = new TranslationCache(2000);
+        final TranslationCache.Scope scope = cache.openScope("GC1");
+        scope.put("en:de:source", "translation");
+        scope.close(true);
+        scope.put("en:de:source", "late result");
+        assertThat(cache.openScope("GC1").get("en:de:source")).isNull();
+        assertThat(cache.sizeInBytes()).isZero();
+    }
+
+    @Test
+    public void recreationPreservesEntriesButRejectsOldCallbacks() {
+        final TranslationCache cache = new TranslationCache(2000);
+        final TranslationCache.Scope oldActivity = cache.openScope("GC1");
+        oldActivity.put("en:de:source", "translation");
+        oldActivity.close(false);
+        oldActivity.put("en:de:source", "stale result");
+        final TranslationCache.Scope recreated = cache.openScope("GC1");
+        assertThat(recreated.get("en:de:source")).isEqualTo("translation");
+        recreated.put("en:de:other", "new translation");
+        assertThat(recreated.get("en:de:other")).isEqualTo("new translation");
+    }
+
+    @Test
+    public void clearingScopeReleasesItsBudget() {
+        final TranslationCache cache = new TranslationCache(2000);
+        final TranslationCache.Scope scope = cache.openScope("GC1");
+        scope.put("source", "translation");
+        assertThat(cache.sizeInBytes()).isPositive();
+        scope.close(true);
+        assertThat(cache.sizeInBytes()).isZero();
+    }
+
+    @Test
+    public void recreatedActivityCanClearEntriesWithoutTranslatingAgain() {
+        final TranslationCache cache = new TranslationCache(2000);
+        final TranslationCache.Scope oldActivity = cache.openScope("GC1");
+        oldActivity.put("source", "translation");
+        oldActivity.close(false);
+        cache.openScope("GC1").close(true);
+        assertThat(cache.sizeInBytes()).isZero();
+    }
+
+    @Test
+    public void languagePairsRemainSeparateWithinScope() {
+        final TranslationCache cache = new TranslationCache(2000);
+        final TranslationCache.Scope scope = cache.openScope("GC1");
+        scope.put("en:de:source", "German");
+        scope.put("en:fr:source", "French");
+        assertThat(scope.get("en:de:source")).isEqualTo("German");
+        assertThat(scope.get("en:fr:source")).isEqualTo("French");
+    }
 }

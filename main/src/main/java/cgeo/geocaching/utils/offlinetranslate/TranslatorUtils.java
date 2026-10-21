@@ -5,6 +5,7 @@ import cgeo.geocaching.settings.Settings;
 import cgeo.geocaching.ui.SimpleItemListModel;
 import cgeo.geocaching.ui.TextParam;
 import cgeo.geocaching.ui.dialog.SimpleDialog;
+import cgeo.geocaching.utils.AndroidRxUtils;
 import cgeo.geocaching.utils.LocalizationUtils;
 
 import android.content.Context;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.apache.commons.lang3.StringUtils;
@@ -70,24 +72,46 @@ public class TranslatorUtils {
 
     /** translates texts with special handling in cases it is normal text or contains HTML */
     public static Disposable translateAny(@NonNull final ITranslatorImpl translator, final String textOrHtml, final Consumer<String> consumer) {
+        return translateCached(null, translator, textOrHtml, WORKER_SINGLE, consumer, error -> consumer.accept(null));
+    }
 
-        //if possible, return from cache
-        final String cacheKey = translator.getSourceLanguage() + ":" + translator.getTargetLanguage() + ":" + textOrHtml;
-        final String cacheTranslated = TRANSLATION_CACHE.get(cacheKey);
-        if (cacheTranslated != null) {
-            return WORKER_SINGLE.scheduleDirect(() -> consumer.accept(cacheTranslated));
+    public static TranslationCache.Scope openCacheScope(final String geocode) {
+        return TRANSLATION_CACHE.openScope(geocode);
+    }
+
+    public static Disposable translateCached(@Nullable final TranslationCache.Scope scope, final ITranslatorImpl translator,
+                                            final String source, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
+        return translateCached(scope, translator, source, AndroidRxUtils.mainThreadScheduler, onSuccess, onError);
+    }
+
+    static Disposable translateCached(final TranslationCache.Scope scope, final ITranslatorImpl translator,
+                                     final String source, final Scheduler callbacks,
+                                     final Consumer<String> onSuccess, final Consumer<Exception> onError) {
+        final CompositeDisposable tasks = new CompositeDisposable();
+        if (StringUtils.isBlank(source)) {
+            return TranslationTask.schedule(tasks, callbacks, callbacks, () -> source, onSuccess, onError);
         }
-        final Consumer<String> cacheAwareConsumer = t -> {
-            if (t != null) {
-                TRANSLATION_CACHE.put(cacheKey, t);
+        final String cacheKey = translator.getSourceLanguage() + ":" + translator.getTargetLanguage() + ":" + source;
+        final String cached = scope == null ? TRANSLATION_CACHE.get("global:" + cacheKey) : scope.get(cacheKey);
+        if (cached != null) {
+            return TranslationTask.schedule(tasks, callbacks, callbacks, () -> cached, onSuccess, onError);
+        }
+        tasks.add(translator.translate(source, translated -> {
+            if (tasks.isDisposed()) {
+                return;
             }
-            consumer.accept(t);
-        };
-        if (StringUtils.isBlank(textOrHtml)) {
-            return WORKER_SINGLE.scheduleDirect(() -> consumer.accept(textOrHtml));
-        }
-        return translator.translate(textOrHtml, tr -> runOnWorker(() -> cacheAwareConsumer.accept(tr)),
-                ex -> runOnWorker(() -> consumer.accept(null)));
+            if (translated != null) {
+                if (scope == null) {
+                    TRANSLATION_CACHE.put("global:" + cacheKey, translated);
+                } else {
+                    scope.put(cacheKey, translated);
+                }
+            }
+            TranslationTask.schedule(tasks, callbacks, callbacks, () -> translated, onSuccess, onError);
+        }, error -> TranslationTask.schedule(tasks, callbacks, callbacks, () -> {
+            throw error;
+        }, onSuccess, onError)));
+        return tasks;
     }
 
     public static void downloadLanguageModels(final Context context) {
