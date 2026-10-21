@@ -57,6 +57,15 @@ public abstract class LogsViewCreator extends TabbedViewPagerFragment<LogsPageBi
     }
 
     @Override
+    public void onDestroyView() {
+        for (OfflineTranslateUtils.Status status : translationStatusByLog.values()) {
+            status.abortTranslation();
+        }
+        translationStatusByLog.clear();
+        super.onDestroyView();
+    }
+
+    @Override
     public LogsPageBinding createView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         return LogsPageBinding.inflate(inflater, container, false);
     }

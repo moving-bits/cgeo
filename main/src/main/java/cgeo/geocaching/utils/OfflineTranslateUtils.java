@@ -32,6 +32,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.google.android.material.button.MaterialButton;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -100,8 +102,9 @@ public class OfflineTranslateUtils {
     }
 
     public static void translateTextAutoDetectLng(final Activity activity, final Status translationStatus, final String text, final Consumer<Language> unsupportedLngConsumer, final Consumer<List<Language>> downloadingModelConsumer, final Consumer<ITranslatorImpl> translatorConsumer) {
+        final long generation = translationStatus.getGeneration();
         detectLanguage(text, lng -> {
-            getTranslator(activity, translationStatus, lng, unsupportedLngConsumer, downloadingModelConsumer, translatorConsumer);
+            translationStatus.runIfCurrent(generation, () -> getTranslator(activity, translationStatus, lng, unsupportedLngConsumer, downloadingModelConsumer, translatorConsumer));
         }, e -> {
 
         });
@@ -116,6 +119,20 @@ public class OfflineTranslateUtils {
      * @param translatorConsumer        returns the translator object
      */
     public static void getTranslator(final Activity activity, final Status translationStatus, final Language sourceLng, final Consumer<Language> unsupportedLngConsumer, final Consumer<List<OfflineTranslateUtils.Language>> downloadingModelConsumer, final Consumer<ITranslatorImpl> translatorConsumer) {
+        final long generation = translationStatus.getGeneration();
+        if (!translationStatus.isCurrent(generation)) {
+            return;
+        }
+        final Consumer<ITranslatorImpl> receiveTranslator = translator -> {
+            if (!translationStatus.runIfCurrent(generation, () -> {
+                if (translator != null) {
+                    translationStatus.addTranslationTask(Disposable.fromRunnable(translator::dispose));
+                }
+                translatorConsumer.accept(translator);
+            }) && translator != null) {
+                translator.dispose();
+            }
+        };
         if (!isLanguageSupported(sourceLng)) {
             unsupportedLngConsumer.accept(sourceLng);
             return;
@@ -124,19 +141,24 @@ public class OfflineTranslateUtils {
         final String sourceLngCode = TranslateAccessor.get().fromLanguageTag(sourceLng.getCode());
         findMissingLanguageModels(sourceLngCode, missingLanguageModels -> {
             if (missingLanguageModels.isEmpty()) {
-                OfflineTranslateUtils.getTranslator(sourceLngCode, translatorConsumer);
+                OfflineTranslateUtils.getTranslator(sourceLngCode, receiveTranslator);
             } else {
                 SimpleDialog.of(activity).setTitle(R.string.translator_model_download_confirm_title).setMessage(TextParam.id(R.string.translator_model_download_confirm_txt, String.join(", ", missingLanguageModels.stream().map(OfflineTranslateUtils.Language::toString).collect(Collectors.toList())))).confirm(() -> {
-                    downloadingModelConsumer.accept(missingLanguageModels);
-                    OfflineTranslateUtils.getTranslator(sourceLngCode, translatorConsumer);
+                    translationStatus.runIfCurrent(generation, () -> {
+                        downloadingModelConsumer.accept(missingLanguageModels);
+                        OfflineTranslateUtils.getTranslator(sourceLngCode, receiveTranslator);
+                    });
                 },
-                    translationStatus::abortTranslation
+                    () -> translationStatus.runIfCurrent(generation, translationStatus::abortTranslation)
                 );
             }
         });
     }
 
     public static void translateParagraph(final ITranslatorImpl translator, final OfflineTranslateUtils.Status status, final String text, @NonNull final Consumer<SpannableStringBuilder> consumer, final Consumer<Exception> errorConsumer) {
+        if (status != null && !status.isCurrent(status.getGeneration())) {
+            return;
+        }
         // safeguards
         if (StringUtils.isBlank(text) || status == null) {
             consumer.accept(new SpannableStringBuilder(StringUtils.isBlank(text) ? "" : text));
@@ -157,7 +179,7 @@ public class OfflineTranslateUtils {
             status.updateProgress();
         } else {
             for (TextNode textNode : elements) {
-                translator.translate(textNode.text(),
+                status.translate(translator, textNode.text(),
                         translation -> {
                             textNode.text(translation);
                             // check if all done
@@ -341,6 +363,8 @@ public class OfflineTranslateUtils {
     }
 
     public static class Status {
+        private CompositeDisposable translationTasks = new CompositeDisposable();
+        private long generation;
         private Language sourceLanguage = new Language(LANGUAGE_INVALID);
         private TranslationProgressHandler progressHandler;
         private boolean isTranslated = false;
@@ -348,6 +372,39 @@ public class OfflineTranslateUtils {
         private int translatedTexts = 0;
         private Consumer<Language> languageChangeConsumer;
         private boolean needsRetranslation = false;
+
+        public synchronized long getGeneration() {
+            return generation;
+        }
+
+        public synchronized boolean isCurrent(final long expectedGeneration) {
+            return generation == expectedGeneration && !translationTasks.isDisposed();
+        }
+
+        /** Guards late model-download and translation callbacks against an aborted/replaced session. */
+        public synchronized boolean runIfCurrent(final long expectedGeneration, final Runnable action) {
+            if (!isCurrent(expectedGeneration)) {
+                return false;
+            }
+            action.run();
+            return true;
+        }
+
+        private synchronized void addTranslationTask(final Disposable task) {
+            translationTasks.add(task);
+        }
+
+        public synchronized void translate(final ITranslatorImpl translator, final String text,
+                                           final Consumer<String> onSuccess, final Consumer<Exception> onError) {
+            if (translationTasks.isDisposed()) {
+                return;
+            }
+            final long currentGeneration = generation;
+            final CompositeDisposable currentTasks = translationTasks;
+            currentTasks.add(translator.translate(text,
+                    result -> runIfCurrent(currentGeneration, () -> onSuccess.accept(result)),
+                    error -> runIfCurrent(currentGeneration, () -> onError.accept(error))));
+        }
 
         public Language getSourceLanguage() {
             return sourceLanguage;
@@ -373,6 +430,8 @@ public class OfflineTranslateUtils {
         }
 
         public synchronized void startTranslation(final int textsToTranslate, @Nullable final AbstractActivity activity, @Nullable final MaterialButton button) {
+            abortTranslation();
+            translationTasks = new CompositeDisposable();
             setNotTranslated();
             this.textsToTranslate = textsToTranslate;
             this.translatedTexts = 0;
@@ -383,8 +442,11 @@ public class OfflineTranslateUtils {
         }
 
         public synchronized void abortTranslation() {
+            generation++;
+            translationTasks.dispose();
             if (null != this.progressHandler) {
                 this.progressHandler.sendEmptyMessage(DisposableHandler.DONE);
+                this.progressHandler = null;
             }
             setNotTranslated();
         }

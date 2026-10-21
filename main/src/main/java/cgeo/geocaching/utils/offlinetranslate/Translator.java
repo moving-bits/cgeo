@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
 /**
@@ -50,6 +51,7 @@ public class Translator {
     private TranslatorError error = TranslatorError.NONE;
 
     private ITranslatorImpl translatorImplementation;
+    private final CompositeDisposable pendingTranslations = new CompositeDisposable();
     private final Disposable modelStateListener;
 
     private final Object mutex = new Object();
@@ -268,6 +270,7 @@ public class Translator {
     private void invalidateCurrentGen() {
         //invalidate current run
         generationId.addAndGet(1);
+        pendingTranslations.clear();
         translateRunItems.clear();
     }
 
@@ -317,7 +320,7 @@ public class Translator {
         translateRunItems.add(itemId);
         //Log.iForce(LOGPRAEFIX + " translate START (" + translateRunItems.size() + "):" + source);
         changeState(TranslatorState.TRANSLATING);
-        TranslatorUtils.translateAny(translatorImplementation, source, translated -> runOnWorker(() -> {
+        pendingTranslations.add(TranslatorUtils.translateAny(tImpl, source, translated -> runOnWorker(() -> {
             //Log.iForce(LOGPRAEFIX + " translate STOP (" + translateRunItems.size() + ") '" + source + "' -> '" + translated + "'");
             if (runId != generationId.get()) {
                 //run was invalidated
@@ -329,10 +332,13 @@ public class Translator {
                 changeState(TranslatorState.TRANSLATED);
             }
             AndroidRxUtils.runOnUi(() -> {
+                if (runId != generationId.get()) {
+                    return;
+                }
                 Log.d(LOGPRAEFIX + "fire translate for " + logShort(source) + " -> " + logShort(translated));
                 translate.accept(translated, true);
             });
-        }));
+        })));
     }
 
     private static String logShort(final String text) {

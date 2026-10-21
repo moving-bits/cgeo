@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 public class NoopTranslateAccessor implements ITranslateAccessor {
 
@@ -50,6 +52,7 @@ public class NoopTranslateAccessor implements ITranslateAccessor {
     @Override
     public ITranslatorImpl getTranslator(final String sourceLanguage, final String targetLanguage) {
         return new ITranslatorImpl() {
+            private final CompositeDisposable tasks = new CompositeDisposable();
 
             @Override
             public String getSourceLanguage() {
@@ -62,13 +65,14 @@ public class NoopTranslateAccessor implements ITranslateAccessor {
             }
 
             @Override
-            public void translate(final String source, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
-                runOnScheduler(() -> onSuccess.accept(source));
+            public Disposable translate(final String source, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
+                final Scheduler callbacks = scheduler != null ? scheduler : AndroidRxUtils.mainThreadScheduler;
+                return TranslationTask.schedule(tasks, callbacks, callbacks, () -> source, onSuccess, onError);
             }
 
             @Override
             public void dispose() {
-                //do nothing
+                tasks.dispose();
             }
         };
     }

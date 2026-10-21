@@ -293,6 +293,7 @@ public abstract class TabbedViewPagerActivity extends AbstractActionBarActivity 
     @Override
     protected void onDestroy() {
         Log.d("TabbedViewPagerActivity.onDestroy");
+        translationStatus.abortTranslation();
         if (viewPager != null) {
             viewPager.unregisterOnPageChangeCallback(pageChangeCallback);
         }

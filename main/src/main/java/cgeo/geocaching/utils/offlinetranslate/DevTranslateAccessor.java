@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 /** ITranslateAccessor for testing purposes. Simulates language guessing (always it) and download */
 public class DevTranslateAccessor implements ITranslateAccessor {
@@ -62,6 +64,7 @@ public class DevTranslateAccessor implements ITranslateAccessor {
     @Override
     public ITranslatorImpl getTranslator(final String sourceLanguage, final String targetLanguage) {
         return new ITranslatorImpl() {
+            private final CompositeDisposable tasks = new CompositeDisposable();
 
             @Override
             public String getSourceLanguage() {
@@ -74,15 +77,15 @@ public class DevTranslateAccessor implements ITranslateAccessor {
             }
 
             @Override
-            public void translate(final String source, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
-                AndroidRxUtils.computationScheduler.scheduleDirect(() -> {
-                    runOnScheduler(() -> onSuccess.accept("[" + sourceLanguage + "->" + targetLanguage + "]" + source));
-                }, 2, TimeUnit.SECONDS);
+            public Disposable translate(final String source, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
+                final Scheduler callbacks = scheduler != null ? scheduler : AndroidRxUtils.mainThreadScheduler;
+                return TranslationTask.schedule(tasks, AndroidRxUtils.computationScheduler, callbacks,
+                        () -> "[" + sourceLanguage + "->" + targetLanguage + "]" + source, onSuccess, onError, 2, TimeUnit.SECONDS);
             }
 
             @Override
             public void dispose() {
-                //do nothing
+                tasks.dispose();
             }
         };
     }

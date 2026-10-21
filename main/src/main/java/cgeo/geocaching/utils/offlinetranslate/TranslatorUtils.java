@@ -17,13 +17,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.apache.commons.lang3.StringUtils;
 
@@ -70,34 +70,25 @@ public class TranslatorUtils {
     }
 
     /** translates texts with special handling in cases it is normal text or contains HTML */
-    public static void translateAny(@NonNull final ITranslatorImpl translator, final String textOrHtml, final Consumer<String> consumer) {
+    public static Disposable translateAny(@NonNull final ITranslatorImpl translator, final String textOrHtml, final Consumer<String> consumer) {
 
         //if possible, return from cache
         final String cacheKey = translator.getSourceLanguage() + ":" + translator.getTargetLanguage() + ":" + textOrHtml;
         final String cacheTranslated = TRANSLATION_CACHE.get(cacheKey);
         if (cacheTranslated != null) {
-            runOnWorker(() -> consumer.accept(cacheTranslated));
-            return;
+            return WORKER_SINGLE.scheduleDirect(() -> consumer.accept(cacheTranslated));
         }
         final Consumer<String> cacheAwareConsumer = t -> {
-            TRANSLATION_CACHE.put(cacheKey, t);
+            if (t != null) {
+                TRANSLATION_CACHE.put(cacheKey, t);
+            }
             consumer.accept(t);
         };
-        final BiConsumer<String, Consumer<String>> cleanedTranslator = (source, c) -> {
-          if (StringUtils.isBlank(source)) {
-              runOnWorker(() -> c.accept(source));
-          } else {
-              translator.translate(source, tr -> {
-                  runOnWorker(() -> c.accept(tr));
-              }, ex -> runOnWorker(() -> c.accept(null)));
-          }
-        };
-
         if (StringUtils.isBlank(textOrHtml)) {
-            runOnWorker(() -> consumer.accept(textOrHtml));
-        } else {
-            cleanedTranslator.accept(textOrHtml, cacheAwareConsumer);
+            return WORKER_SINGLE.scheduleDirect(() -> consumer.accept(textOrHtml));
         }
+        return translator.translate(textOrHtml, tr -> runOnWorker(() -> cacheAwareConsumer.accept(tr)),
+                ex -> runOnWorker(() -> consumer.accept(null)));
     }
 
     public static void downloadLanguageModels(final Context context) {

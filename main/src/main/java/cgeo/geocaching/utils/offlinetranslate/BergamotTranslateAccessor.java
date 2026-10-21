@@ -26,6 +26,8 @@ import dev.davidv.bergamot.LangDetect;
 import dev.davidv.bergamot.NativeLib;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -292,6 +294,7 @@ public class BergamotTranslateAccessor implements ITranslateAccessor {
 
     private ITranslatorImpl createTranslatorImpl(final String sourceLang, final String targetLang) {
         return new ITranslatorImpl() {
+            private final CompositeDisposable tasks = new CompositeDisposable();
 
             @Override
             public String getSourceLanguage() {
@@ -304,49 +307,40 @@ public class BergamotTranslateAccessor implements ITranslateAccessor {
             }
 
             @Override
-            public void translate(final String source, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
-                NATIVE_SCHEDULER.scheduleDirect(() -> {
-                    try {
-                        final String[] result;
-                        // skip translation if src == target
-                        if (sourceLang.equals(targetLang)) {
-                            result = null;
-                        } else if (PIVOT_LANGUAGE.equals(sourceLang)) {
-                            // en → target: direct
-                            loadDirection(PIVOT_LANGUAGE, targetLang);
-                            result = nativeLib.translateMultiple(new String[]{source}, pairKey(PIVOT_LANGUAGE, targetLang));
-                        } else if (PIVOT_LANGUAGE.equals(targetLang)) {
-                            // source → en: direct
-                            loadDirection(sourceLang, PIVOT_LANGUAGE);
-                            result = nativeLib.translateMultiple(new String[]{source}, pairKey(sourceLang, PIVOT_LANGUAGE));
-                        } else {
-                            // source → en → target: pivot via English
-                            loadDirection(sourceLang, PIVOT_LANGUAGE);
-                            loadDirection(PIVOT_LANGUAGE, targetLang);
-                            result = nativeLib.pivotMultiple(
-                                pairKey(sourceLang, PIVOT_LANGUAGE),
-                                pairKey(PIVOT_LANGUAGE, targetLang),
-                                new String[]{source}
-                            );
-                        }
-                        final String translated = (result != null && result.length > 0) ? result[0] : source;
-                        runCallback(() -> onSuccess.accept(translated));
-                    } catch (final Throwable e) {
-                        // Catch Throwable (not just Exception) so that native-library Errors
-                        // (e.g. UnsatisfiedLinkError from translateMultiple/pivotMultiple) don't
-                        // propagate uncaught through RxJava and crash the process.
-                        Log.e(TAG + ": Translation failed", e);
-                        runCallback(() -> onError.accept(asException(e)));
+            public Disposable translate(final String source, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
+                final Scheduler callbacks = callbackScheduler != null ? callbackScheduler : AndroidSchedulers.mainThread();
+                return TranslationTask.schedule(tasks, NATIVE_SCHEDULER, callbacks, () -> {
+                    final String[] result;
+                    // skip translation if src == target
+                    if (sourceLang.equals(targetLang)) {
+                        result = null;
+                    } else if (PIVOT_LANGUAGE.equals(sourceLang)) {
+                        // en → target: direct
+                        loadDirection(PIVOT_LANGUAGE, targetLang);
+                        result = nativeLib.translateMultiple(new String[]{source}, pairKey(PIVOT_LANGUAGE, targetLang));
+                    } else if (PIVOT_LANGUAGE.equals(targetLang)) {
+                        // source → en: direct
+                        loadDirection(sourceLang, PIVOT_LANGUAGE);
+                        result = nativeLib.translateMultiple(new String[]{source}, pairKey(sourceLang, PIVOT_LANGUAGE));
+                    } else {
+                        // source → en → target: pivot via English
+                        loadDirection(sourceLang, PIVOT_LANGUAGE);
+                        loadDirection(PIVOT_LANGUAGE, targetLang);
+                        result = nativeLib.pivotMultiple(
+                            pairKey(sourceLang, PIVOT_LANGUAGE),
+                            pairKey(PIVOT_LANGUAGE, targetLang),
+                            new String[]{source}
+                        );
                     }
-                });
+                    final String translated = (result != null && result.length > 0) ? result[0] : source;
+                    return translated;
+                }, onSuccess, onError);
             }
 
             @Override
             public void dispose() {
-                // Models remain in native memory until the process exits.
-                // NativeLib.cleanup() exists but is not called: reloading all models
-                // after a cleanup would require reinitializing the service, which is
-                // not yet implemented. Acceptable since users typically have 1-2 pairs loaded.
+                tasks.dispose();
+                // Cancelling Java tasks does not unload the process-wide native model cache.
             }
         };
     }

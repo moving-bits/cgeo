@@ -1930,7 +1930,7 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
                     final String hintPlain = Settings.getHintAsRot13()
                             ? CryptUtils.rot13(binding.hint.getText().toString())
                             : binding.hint.getText().toString();
-                    translator.translate(hintPlain,
+                    translateHint(translator, hintPlain,
                             translated -> binding.hint.setText(translated),
                             e -> binding.hint.setText(hintPlain)); // show plain text on translation error
                 } else {
@@ -1942,7 +1942,14 @@ public class CacheDetailActivity extends TabbedViewPagerActivity
             binding.hintBox.setOnClickListener(listener);
             if (!Settings.getHintAsRot13()) {
                 final String hintPlain = binding.hint.getText().toString();
-                translator.translate(hintPlain, translated -> binding.hint.setText(translated), e -> binding.hint.setText(hintPlain));
+                translateHint(translator, hintPlain, translated -> binding.hint.setText(translated), e -> binding.hint.setText(hintPlain));
+            }
+        }
+
+        private void translateHint(final ITranslatorImpl translator, final String text, final Consumer<String> onSuccess, final Consumer<Exception> onError) {
+            final CacheDetailActivity activity = (CacheDetailActivity) getActivity();
+            if (activity != null) {
+                activity.translationStatus.translate(translator, text, onSuccess, onError);
             }
         }
 
