@@ -5,7 +5,6 @@ import cgeo.geocaching.settings.Settings;
 import cgeo.geocaching.ui.SimpleItemListModel;
 import cgeo.geocaching.ui.TextParam;
 import cgeo.geocaching.ui.dialog.SimpleDialog;
-import cgeo.geocaching.utils.LeastRecentlyUsedMap;
 import cgeo.geocaching.utils.LocalizationUtils;
 
 import android.content.Context;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -31,7 +29,8 @@ public class TranslatorUtils {
 
     private static final Scheduler WORKER_SINGLE = Schedulers.single();
 
-    private static final Map<String, String> TRANSLATION_CACHE = Collections.synchronizedMap(new LeastRecentlyUsedMap.LruCache<>(300));
+    // 20 MB, counting both source/language keys and translated text.
+    private static final TranslationCache TRANSLATION_CACHE = new TranslationCache(20_000_000);
 
     private TranslatorUtils() {
         //no instance
